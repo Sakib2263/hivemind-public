@@ -3,6 +3,7 @@
 
   python3 usage.py                 write USAGE.md (Hivemind root) and print it
   python3 usage.py brief           print only the "At a glance" table
+  python3 usage.py watch           live view in a terminal, refreshed every minute (Mac/Linux "overlay")
   python3 usage.py ask             type in readings the scripts can't get (Flow credits; Claude/Antigravity % if live fails)
   python3 usage.py note KEY VALUE  save one reading, e.g. note claude-session 40
 
@@ -453,6 +454,15 @@ def note(key, value):
 
 def main():
     a = sys.argv[1:]
+    if a[:1] == ["watch"]:
+        import time
+        try:
+            while True:
+                r = subprocess.run([sys.executable, os.path.abspath(__file__), "brief"], capture_output=True, text=True)
+                print("\033[2J\033[H" + r.stdout.strip() + "\n\nRefreshes every minute. Ctrl+C to close.", flush=True)
+                time.sleep(60)
+        except KeyboardInterrupt:
+            return
     if a[:1] == ["note"] and len(a) == 3:
         note(a[1], a[2])
         return

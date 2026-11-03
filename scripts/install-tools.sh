@@ -12,14 +12,30 @@ ok()   { echo "[OK]   $*"; }
 step() { echo; echo "=== $* ==="; }
 fail() { echo "[FAIL] $*"; FAILED="$FAILED\n- $*"; }
 FAILED=""
+OS="$(uname -s)"; WSL=0; grep -qi microsoft /proc/version 2>/dev/null && WSL=1   # Windows: WSL. Also runs on macOS and Linux
 
-step "1/11 Base packages (type your Ubuntu password when asked)"
-sudo -v && sudo apt-get update -y && sudo apt-get install -y git curl build-essential python3 python3-pip python3-venv unzip \
-  && ok "base packages" || fail "base packages"
+step "1/11 Base packages (type your password when asked)"
+if [ "$OS" = Darwin ]; then   # macOS: Xcode command-line tools, Homebrew, GNU tools + bash 5 (mac-linux/_env.sh puts them first)
+  xcode-select -p >/dev/null 2>&1 || { xcode-select --install; echo "Finish the Xcode tools window, then run this again."; exit 1; }
+  command -v brew >/dev/null || [ -x /opt/homebrew/bin/brew ] || [ -x /usr/local/bin/brew ] \
+    || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  for b in /opt/homebrew /usr/local; do [ -x "$b/bin/brew" ] && eval "$("$b/bin/brew" shellenv)" && break; done
+  brew install git python coreutils gnu-sed findutils grep gawk bash unzip rsync && ok "base packages (Homebrew)" || fail "base packages"
+  . "$KIT/mac-linux/_env.sh"
+elif command -v apt-get >/dev/null; then
+  sudo -v && sudo apt-get update -y && sudo apt-get install -y git curl build-essential python3 python3-pip python3-venv unzip \
+    && ok "base packages" || fail "base packages"
+else   # other Linux: check instead of install
+  miss=""; for t in git curl make gcc python3 unzip; do command -v $t >/dev/null || miss="$miss $t"; done
+  [ -z "$miss" ] && ok "base packages" || fail "base packages: install$miss with your package manager, then run this again"
+fi
+[ "$1" = "--basics" ] && { echo; [ -n "$FAILED" ] && echo -e "FAILED:$FAILED" || echo "Basics OK. Next: 2 Install AI Tools."; exit 0; }
 
 step "2/11 Stop Ubuntu from using Windows programs"
+if [ "$WSL" = 1 ]; then
 grep -q "appendWindowsPath" /etc/wsl.conf 2>/dev/null || printf '\n[interop]\nappendWindowsPath=false\n' | sudo tee -a /etc/wsl.conf >/dev/null
 grep -q "appendWindowsPath=false" /etc/wsl.conf && ok "wsl.conf" || fail "wsl.conf"
+else echo "[SKIP] not Windows"; fi
 export PATH="$(echo "$PATH" | tr ':' '\n' | grep -v '^/mnt/' | paste -sd:)"
 export PATH="$HOME/.local/bin:$PATH"
 
@@ -81,4 +97,4 @@ bash "$KIT/scripts/install-rules.sh" || fail "worker rules"
 step "Summary"
 if [ -n "$FAILED" ]; then echo -e "FAILED:$FAILED"; else echo "ALL STEPS OK"; fi
 echo
-echo "Next: close this window, then double-click '3 Log In.bat'."
+if [ "$WSL" = 1 ]; then echo "Next: close this window, then double-click '3 Log In.bat'."; else echo "Next: run '3 Log In' in mac-linux."; fi

@@ -1,5 +1,7 @@
 # Set up Hivemind (new PC or new person)
 
+**On a Mac or Linux?** Use [mac-linux/README.md](mac-linux/README.md) instead. The steps below are for Windows.
+
 Hivemind turns the Claude desktop app into the lead of a small AI team: Claude plans and reviews, free models
 (opencode, Antigravity) do most of the coding, and scripts do chores (builds, uploads, commits).
 After setup, every chat in your Claude Project already knows the rules and has the skills. Nothing to paste again.

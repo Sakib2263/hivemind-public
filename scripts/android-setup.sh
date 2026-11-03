@@ -8,8 +8,13 @@ SDK="$HOME/android-sdk"
 ok() { echo "[OK]   $*"; }; fail() { echo "[FAIL] $*"; FAILED=1; }
 
 echo "=== 1/4 Java 21 (type your Ubuntu password if asked) ==="
+if [ "$(uname -s)" = Darwin ]; then   # macOS: Homebrew Java 21 (mac-linux/_env.sh adds it to PATH)
+  brew list openjdk@21 >/dev/null 2>&1 || brew install openjdk@21
+  export PATH="$(brew --prefix)/opt/openjdk@21/bin:$PATH"
+else
 command -v javac >/dev/null && javac -version 2>&1 | grep -q " 21" || sudo apt-get install -y openjdk-21-jdk-headless unzip
 command -v rsync >/dev/null && command -v unzip >/dev/null || sudo apt-get install -y rsync unzip
+fi
 javac -version 2>&1 | grep -q " 21" && ok "$(javac -version 2>&1)" || fail "Java 21"
 
 echo; echo "=== 2/4 Android command-line tools ==="
@@ -17,7 +22,7 @@ if [ ! -x "$SDK/cmdline-tools/latest/bin/sdkmanager" ]; then
   tmp="$(mktemp -d)"
   # newest first; Google changes the build number now and then
   for v in 15859902 13114758 11076708; do
-    curl -fsSL -o "$tmp/t.zip" "https://dl.google.com/android/repository/commandlinetools-linux-${v}_latest.zip" && break
+    curl -fsSL -o "$tmp/t.zip" "https://dl.google.com/android/repository/commandlinetools-$([ "$(uname -s)" = Darwin ] && echo mac || echo linux)-${v}_latest.zip" && break
   done
   mkdir -p "$SDK/cmdline-tools" && unzip -q -o "$tmp/t.zip" -d "$tmp" && rm -rf "$SDK/cmdline-tools/latest" && mv "$tmp/cmdline-tools" "$SDK/cmdline-tools/latest"
   rm -rf "$tmp"

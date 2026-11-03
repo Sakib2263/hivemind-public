@@ -17,6 +17,7 @@ set "MSG="
 set /p "MSG=Describe the change (Enter = 'update Hivemind'): "
 if "%MSG%"=="" set "MSG=update Hivemind"
 git add -A
+git add --chmod=+x -- "mac-linux/*.command" "mac-linux/shortcuts/*.command" >nul 2>&1
 git commit -m "%MSG%" || echo Nothing new to save.
 git ls-remote --exit-code --heads origin main >nul 2>&1 && (git pull --rebase origin main || (echo Pull failed. Ask Claude to help. & pause & exit /b 1))
 git push -u origin main || (echo Upload failed. Check the sign-in window, then try again. & pause & exit /b 1)

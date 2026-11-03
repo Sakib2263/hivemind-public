@@ -31,7 +31,9 @@ echo; echo "=== Android builds (optional) ==="
 if [ -x "$HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager" ]; then
   echo "java: $(javac -version 2>&1)   sdk: $HOME/android-sdk   adb: $("$HOME/android-sdk/platform-tools/adb" version 2>/dev/null | head -1)"
   [ -f "$KIT/secrets/android/signing.env" ] && echo "release signing: set up" || echo "release signing: not set up yet (asked on the first release build)"
+  if grep -qi microsoft /proc/version 2>/dev/null; then
   [ -f "$KIT/tools/platform-tools/adb.exe" ] && echo "adb for Windows: ready" || echo "adb for Windows: missing (run 6 Optional - Android Build Tools.bat)"
+  else command -v adb >/dev/null || [ -x "$HOME/android-sdk/platform-tools/adb" ] && echo "adb: ready" || echo "adb: missing (run 6 Optional - Android Build Tools)"; fi
 else echo "not set up (only needed for Android builds: run 6 Optional - Android Build Tools.bat)"; fi
 
 echo; echo "=== Worker rules and skills ==="

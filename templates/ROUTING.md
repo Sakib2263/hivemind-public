@@ -12,6 +12,9 @@ Model names: `config/models.env`. Worker rules: `rules/AGENTS-floor.md`. Checks:
   and the relay skips it for an hour. Never leave a provider out just because it's on a free tier.
 - A plan or key added later: move that provider earlier in the chains in `config/models.env`.
 
+**Mac/Linux:** shortcut names in these rules are the Windows `.bat` ones. On Mac/Linux the same number and name is
+in `mac-linux/` or `mac-linux/shortcuts/` as a `.command` file, and a relay `dir:` is the normal path (`/Users/me/Work/My Game`).
+
 ## 1. Open every task with one line
 `class · lead model · workers · expected result`
 Example: `feature · Sonnet · opencode + review + gate build · level select screen in src/ui/levels.js`

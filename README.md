@@ -1,6 +1,7 @@
 # Hivemind: one lead AI, a team of models
 
-**New here? Start with [SETUP.md](SETUP.md).** Everyday use and every file: GUIDE.md.
+**New here? Start with [SETUP.md](SETUP.md)** (Windows) or [mac-linux/README.md](mac-linux/README.md) (Mac and Linux).
+Everyday use and every file: GUIDE.md.
 
 **New here? Start with [GUIDE.md](GUIDE.md):** which file does what, and what to use after what.
 

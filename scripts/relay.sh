@@ -190,13 +190,14 @@ attempt() {  # one try: $1 worker  $2 model (for gate/review: engine[:model])  -
       rm -f "$res.resp" ;;
     install)
       # apk path inside the project, or empty = newest builds/android/*.apk; Windows adb, phone on USB with USB debugging on
-      local p f adb="$ROOT/tools/platform-tools/adb.exe"
+      local p f adb="$ROOT/tools/platform-tools/adb.exe" win=1
+      grep -qi microsoft /proc/version 2>/dev/null || { win=0; adb="$(command -v adb || ls "$HOME/android-sdk/platform-tools/adb" "$ROOT/tools/platform-tools/adb" 2>/dev/null | head -1)"; }
       p="$(printf '%s' "$prompt" | head -1 | tr -d '\r')"
       if [ -z "$p" ]; then f="$(ls -t "$real"/builds/android/*.apk 2>/dev/null | head -1)"; else f="$(realpath -m "$real/$p")"; fi
       [[ -n "$f" && "$f" == "$real"/* && -f "$f" ]] || { echo "REFUSED: no apk found"; return 1; }
       bash "$ROOT/scripts/get-adb.sh" || { echo "adb download failed"; return 1; }
       "$adb" devices
-      timeout 300 "$adb" install -r "$(wslpath -w "$f")" ;;
+      if [ "$win" = 1 ]; then timeout 300 "$adb" install -r "$(wslpath -w "$f")"; else timeout 300 "$adb" install -r "$f"; fi ;;
     comfy)
       # body line 1: shots file inside the project (default shots.json), optional words: force, only=id,id
       # AI clips and stills on the Windows GPU through ComfyUI (shortcuts\14 Start Video Studio.bat must be open)

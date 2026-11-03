@@ -1,5 +1,8 @@
 # Hivemind guide: what every file does, and what to use when
 
+**Mac/Linux:** the same guide applies; where it names a `.bat`, use the `.command` with the same number in
+`mac-linux/` (setup steps) or `mac-linux/shortcuts/`. Setup: [mac-linux/README.md](mac-linux/README.md).
+
 Start here. The README has the deeper detail; this page tells you which file to open, in which order.
 
 ## What Hivemind is
