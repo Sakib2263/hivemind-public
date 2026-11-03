@@ -4,7 +4,7 @@
   python3 usage.py                 write USAGE.md (Hivemind root) and print it
   python3 usage.py brief           print only the "At a glance" table
   python3 usage.py watch           live view in a terminal, refreshed every minute (Mac/Linux "overlay")
-  python3 usage.py ask             type in readings the scripts can't get (Flow credits; Claude/Antigravity % if live fails)
+  python3 usage.py ask             type in Claude/Antigravity % by hand, only when the live reading fails
   python3 usage.py note KEY VALUE  save one reading, e.g. note claude-session 40
 
 Live quotas (real % used and reset times, read with the logins already on this PC):
@@ -340,9 +340,13 @@ def build():
     for label, spec, budget_key, since, wname in (
         ("opencode GLM (free)", "opencode:free", "OPENCODE_FREE_JOBS_DAY", DAY0, "jobs today"),
         ("opencode DeepSeek (free2)", "opencode:free2", "OPENCODE_FREE2_JOBS_DAY", DAY0, "jobs today"),
+        ("NVIDIA MiniMax (nv)", "opencode:nv", "NVIDIA_JOBS_DAY", DAY0, "jobs today"),
+        ("NVIDIA Nemotron (nv2)", "opencode:nv2", "NVIDIA2_JOBS_DAY", DAY0, "jobs today"),
         ("Antigravity jobs", "agy", "AGY_JOBS_WEEK", WEEK0, "jobs this week"),
     ):
         js = [r for r in lg if r["t"] >= since and (r["spec"] == spec or (spec == "agy" and r["spec"].startswith("agy")))]
+        if spec.startswith("opencode:nv") and not js and not env(os.path.join(KIT, "secrets", "keys.env")).get("NVIDIA_API_KEY"):
+            continue   # optional provider, not set up
         hit = max([r["t"] for r in js if r["limit"]], default=None)
         budget = num(L.get(budget_key))
         lp = max(0, 100 - len(js) / budget * 100) if budget else None
@@ -363,19 +367,17 @@ def build():
     if L.get("CODEX_PLAN") or cx:
         live_rows("Codex", live("codex"), [])
 
-    clip = num(L.get("FLOW_FAST_CLIP")) or 20
-    monthly = num(L.get("FLOW_MONTHLY")) or 1000
-    for acc in (L.get("FLOW_ACCOUNTS") or "").split():
-        t, v, note = reading(f"flow-{acc}", timedelta(days=1))
-        row(f"Google Flow {acc}", "credits left", note, f"{v:.0f} (~{int(v // clip)} Fast clips)" if v is not None else "?",
-            status(v / monthly * 100 if v is not None else None, None, "?"), 100 - v / monthly * 100 if v is not None else None)
-
     out.append(f"# Usage overview\nUpdated {NOW.strftime('%d %b %Y %H:%M')}. Refresh: `windows\shortcuts\\19 Usage.bat`, "
                "or it updates after every relay job.\n")
     out.append("## At a glance\n| Provider | Window | Used | Left | Resets in | Status |\n|---|---|---|---|---|---|")
     out += [f"| {g['provider']} | {g['window']} | {g['used']} | {g['left']} | {g['until'] or '-'} | {g['status']} |" for g in glance]
-    out.append("\nClaude and Antigravity are read live (cached 5 min). Flow credits can't be read by a script: "
-               "type them in with `19 Usage.bat` when you make videos.\n")
+    prov = providers_state()
+    miss = [p for p in prov if p["status"] != "ok"]
+    if miss:
+        out.append("\n**Not connected:** " + "; ".join(
+            f"{p['provider']}{'' if p['needed'] else ' (optional)'}: {p['fix']}" for p in miss))
+    out.append("\nClaude and Antigravity are read live (cached 5 min). Only what can be read automatically is tracked "
+               "(Google Flow credits can't be, so they are not shown).\n")
 
     # token tables
     def table(title, rows, periods, note=""):
@@ -425,7 +427,17 @@ def build():
         s = total(hb)
         out.append(f"Calibration: Claude Code hit its limit at {when(hit)} after about {k(s['i'] + s['o'] + s['cw'])} tokens "
                    "in that window. Put that number in CLAUDE_CODE_TOKENS_5H (config/limits.env) to get a % gauge.\n")
-    return "\n".join(out), glance
+    return "\n".join(out), glance, prov
+
+
+def providers_state():
+    """Which tools and keys are connected (scripts/providers.py), for the report and the overlay."""
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import providers
+        return providers.check()
+    except Exception:
+        return []
 
 
 def ask():
@@ -436,7 +448,6 @@ def ask():
                ("claude-week", "Claude: weekly limit, % used")]
     if not ((live("agy") or {}).get("windows")):
         qs += [("agy-week", "Antigravity: weekly quota, % used")]
-    qs += [(f"flow-{a}", f"Google Flow account {a}: credits left") for a in (L.get("FLOW_ACCOUNTS") or "").split()]
     for key, q in qs:
         v = input(f"{q}: ").strip().rstrip("%")
         if v:
@@ -456,6 +467,7 @@ def main():
     a = sys.argv[1:]
     if a[:1] == ["watch"]:
         import time
+        print("Reading usage from each provider: up to a minute the first time...", flush=True)
         try:
             while True:
                 r = subprocess.run([sys.executable, os.path.abspath(__file__), "brief"], capture_output=True, text=True)
@@ -468,11 +480,11 @@ def main():
         return
     if a[:1] == ["ask"]:
         ask()
-    text, glance = build()
+    text, glance, prov = build()
     with open(OUT, "w", encoding="utf-8") as f:
         f.write(text + "\n")
     with open(OUT_JSON + ".tmp", "w", encoding="utf-8") as f:
-        json.dump({"updated": NOW.isoformat(timespec="seconds"), "low_pct": LOW, "rows": glance}, f, indent=1)
+        json.dump({"updated": NOW.isoformat(timespec="seconds"), "low_pct": LOW, "rows": glance, "providers": prov}, f, indent=1)
     os.replace(OUT_JSON + ".tmp", OUT_JSON)
     if a[:1] == ["brief"]:
         s = text.index("## At a glance")

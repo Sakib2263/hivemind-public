@@ -60,7 +60,7 @@ Without the Project instructions (another Project, or a fresh account), start th
 
 ---
 
-## 1. In what order: the five workflows
+## 1. In what order: the workflows
 
 ### A. First time on a PC (about 40 minutes, once)
 **Before you start, you need:** Windows 10 or 11, the Claude desktop app with a Claude Pro or Max plan,
@@ -86,7 +86,7 @@ D:\AI-Work\                 <- work folder: add THIS folder in Claude
 | 1 | `1 Install WSL (run once).bat` | Installs Ubuntu inside Windows. Restart, open Ubuntu, make a username and password |
 | 0 | `0 Optional - Move Ubuntu to another drive.bat` | Only if drive C: has under 15 GB free |
 | 2 | `2 Install AI Tools.bat` | Installs Claude Code, Antigravity, opencode, graphify, PAL, Codex (optional), the worker rules and skills |
-| 3 | `3 Log In.bat` | Logs in to Claude, Antigravity and opencode (free OpenCode Zen key). Codex: type s to skip |
+| 3 | `3 Log In.bat` | Logs in to Claude and Antigravity, asks for your free opencode.ai key (right-click to paste; it is saved as OPENCODE_API_KEY in `secrets\keys.env`), then Codex (type s to skip) |
 | 4 | `4 Add API Keys.bat` | Optional: a free OpenRouter key for extra free models |
 | 5 | `5 Check Everything.bat` | Tests every tool and model. Send `logs\verify.log` to Claude if anything fails |
 | 6 | `6 Optional - Android Build Tools.bat` | Only if you build Android apps: Java, Android SDK, adb (1-2 GB) |
@@ -98,7 +98,7 @@ Done. From now on you only use workflow B and "Starting a chat".
 Second PC: same steps; `Sync - Pull.bat` keeps both PCs on the same Hivemind version (your own private GitHub repo).
 
 ### B. Every working day
-0. `windows\Start Hivemind.bat` (starts the relay and the usage window; right-click the usage window to start it with Windows).
+0. `windows\Start Hivemind.bat` (starts the relay and the usage window, and lists any worker that isn't connected with how to add it; right-click the usage window to start it with Windows).
 1. `windows\Sync - Pull.bat`: get the latest Hivemind from GitHub (also refreshes worker rules and skills).
 2. Leave the relay window that Start Hivemind opened running (minimised) while you work.
 3. In Claude: new chat per task, add the work folder, type the task (see "Starting a chat" above).
@@ -159,6 +159,27 @@ For long jobs you don't want to babysit. Works on any project folder with a TASK
    Handoff), the hours run out, or you run `windows\shortcuts\18 Stop Autopilot.bat`.
 4. Log: `logs\autopilot\`. Check the Handoff and the git log when you're back.
 
+### H. Switch to another account (other work, a client, a new plan)
+`3 Log In` does not log you out: a tool that is already logged in just opens with the old account. Log out
+first, then log in again. Run these in **Ubuntu** (Start menu; Mac/Linux: a terminal).
+
+| Tool | Switch account |
+|---|---|
+| Claude Code | `claude`, then type `/logout`, then `/login` ("Claude account with subscription"), then `/exit`. If `/logout` won't go: `rm ~/.claude/.credentials.json`, then `claude` |
+| opencode | `3 Log In.bat`, step 3: paste the new key (right-click to paste). Or put it in OPENCODE_API_KEY with `4 Add API Keys.bat` |
+| Codex | `codex logout`, then `codex login --device-auth` |
+| Antigravity | `agy`, then log out or switch account inside it, and sign in with the other Google account |
+| OpenRouter, NVIDIA, DeepSeek keys | `4 Add API Keys.bat` again: it overwrites `secrets\keys.env` |
+
+Then `5 Check Everything.bat` to confirm each tool answers.
+- **Browser:** the login link signs in whichever account that browser is using. Use a private window, or sign out of
+  the old account on the website first, or you land on the old account again.
+- **Claude desktop app:** the lead has its own login, separate from Claude Code in Ubuntu. Switch it too
+  (app > your name > Log out) if the lead should use the other account.
+- **One account per tool per PC:** a switch applies to every project and to the relay, autopilot and handoff. For
+  separate work, switch before you start and switch back after. Client or NDA work: use the accounts that work
+  allows (`templates\ROUTING.md` section 8).
+
 ---
 
 ## 2. "I want to..." quick finder
@@ -177,13 +198,15 @@ For long jobs you don't want to babysit. Works on any project folder with a TASK
 | Keep going when Claude is out of quota | `windows\shortcuts\2 Continue Handoff - opencode.bat` |
 | Open a tool in a project myself | `windows\shortcuts\4 Claude Code - Open.bat`, `5 Antigravity - Open.bat`, `3 Codex - Open.bat` (Codex needs a ChatGPT login) |
 | Fix PAL after an update | `windows\shortcuts\7 Fix PAL.bat` |
-| Change which model does what | `config\models.env` (models) and `templates\ROUTING.md` (rules) |
+| Change which model does what | `config\models.env` (models, fallback order) and `templates\routing\models.md` (who gets which job, how switching works) |
+| Add NVIDIA's free models (optional) | Free key at build.nvidia.com, then `4 Add API Keys.bat` (NVIDIA_API_KEY) |
 | Change the rules every worker follows | `rules\AGENTS-floor.md`, then `Sync - Pull.bat` (reinstalls them) |
 | Change a check (build, security, release, review) | `gates\*.md` |
 | Fix security or encryption problems | Ask Claude: it runs the `security` check, then fixes with the `security-hardening` skill |
 | See what my own APK or web build exposes | Ask Claude to use REA on it (after `8 Optional - Reverse Engineering (REA).bat`) |
 | Build my own version of another app | Ask Claude for the Replica skills (`replica-recon` first) |
-| See how much usage I have left (Claude, opencode, Antigravity, OpenRouter, Flow) | `windows\shortcuts\20 Usage Overlay.bat` (live window), `windows\shortcuts\19 Usage.bat` (full report) |
+| See how much usage I have left (Claude, opencode, Antigravity, OpenRouter, Codex) | `windows\shortcuts\20 Usage Overlay.bat` (live window), `windows\shortcuts\19 Usage.bat` (full report) |
+| Use a different account (Claude, opencode, Codex, Antigravity, keys) | Workflow H |
 | Change a usage limit or budget | `config\limits.env` |
 | Know what's planned next | `NEXT.md`, `plans\UNITY-PLAN.md` |
 
@@ -226,8 +249,8 @@ For long jobs you don't want to babysit. Works on any project folder with a TASK
 | `16 Clone Voice.bat` | Drag a folder with voice.wav + lines.txt onto it: one WAV per line in your cloned voice |
 | `17 Autopilot.bat` | Drag a project folder on it: works through its TASKS.md unattended for N hours |
 | `18 Stop Autopilot.bat` | Stops the autopilot after its current step |
-| `19 Usage.bat` | Full usage report per provider and model: today, 5-hour window, week, month, what's left, reset times. Lets you type in Flow credits |
-| `20 Usage Overlay.bat` | Small always-on-top window with usage left per provider, live (Claude and Antigravity read every 5 min). Drag to move; right-click: Refresh, Open full report, Start with Windows, Close |
+| `19 Usage.bat` | Full usage report per provider and model: today, 5-hour window, week, month, what's left, reset times. Lets you type in Claude/Antigravity % by hand if the live reading fails |
+| `20 Usage Overlay.bat` | Small always-on-top window, live (Claude and Antigravity read every 5 min). Simple view: each provider and % left. Header buttons: minimise to one line, detailed view (every window, reset times, a "Not connected" list: hover for how to add), close. Drag to move; right-click: Refresh, Open full report, Start with Windows |
 
 ### `templates\` (copied into projects, or read by Claude)
 | File | Purpose |
@@ -261,7 +284,7 @@ For long jobs you don't want to babysit. Works on any project folder with a TASK
 | File | Purpose |
 |---|---|
 | `config\models.env` | Which model each worker uses, fallback chains, check and review engines. Dated decisions |
-| `config\limits.env` | Usage limits and your own budgets per provider (Claude week reset, job budgets, Flow credits). Dated decisions |
+| `config\limits.env` | Usage limits and your own budgets per provider (Claude week reset, job budgets). Dated decisions |
 | `config\folders.env` | Extra places where projects may live, outside the work folder (New Project fills it in) |
 | `rules\AGENTS-floor.md` | Rules every worker loads (installed into opencode, Claude Code and Codex) |
 | `plans\UNITY-PLAN.md` | The Unity plan: what is ready, what is planned (U1 to U10), decisions needed |
@@ -271,6 +294,8 @@ For long jobs you don't want to babysit. Works on any project folder with a TASK
 |---|---|---|
 | `install-tools.sh` | `2 Install AI Tools.bat` | Installs every tool in Ubuntu |
 | `login.sh` | `3 Log In.bat` | Logs in to each tool |
+| `progress.sh` | Setup, check and key scripts | The live spinner and timer shown while a quiet step runs, so a window never looks stuck |
+| `providers.py` | Log In, Add API Keys, Check Everything, Start Hivemind, usage | Which tools and keys are connected and how to add a missing one; saves keys in `secrets\keys.env`; gives opencode its key |
 | `apply-keys.sh` | `4 Add API Keys.bat` | Connects your keys to PAL |
 | `verify.sh` | `5 Check Everything.bat`, `6 Check All Tools.bat` | Tests tools, models, rules, Android setup |
 | `android-setup.sh` | `6 Optional - Android Build Tools.bat` | Java, Android SDK, adb |

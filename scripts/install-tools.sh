@@ -8,6 +8,8 @@
 KIT="$(cd "$(dirname "$0")/.." && pwd)"
 LOG="$KIT/logs/install-tools.log"
 exec > >(tee "$LOG") 2>&1
+. "$KIT/scripts/progress.sh"   # busy: live timer for the quiet steps
+echo "Installing the AI tools: about 10 to 20 minutes. Each step shows its progress or a live timer."
 ok()   { echo "[OK]   $*"; }
 step() { echo; echo "=== $* ==="; }
 fail() { echo "[FAIL] $*"; FAILED="$FAILED\n- $*"; }
@@ -68,27 +70,27 @@ hash -r; command -v opencode >/dev/null && ok "opencode $(opencode --version 2>/
 step "8/11 graphify (shared project memory)"
 command -v graphify >/dev/null || uv tool install "graphifyy[pdf,office]"
 uv tool update-shell >/dev/null 2>&1; hash -r
-command -v graphify >/dev/null && graphify install >/dev/null && ok "graphify + Claude Code skill" || fail "graphify"
+command -v graphify >/dev/null && busy "adding the graphify skill" graphify install && ok "graphify + Claude Code skill" || fail "graphify"
 
 step "Extra: clanker-usage (live Claude and Antigravity quota for the usage overview)"
-command -v clanker-usage >/dev/null || uv tool install clanker-usage >/dev/null 2>&1
+command -v clanker-usage >/dev/null || busy "installing clanker-usage" uv tool install clanker-usage
 hash -r; command -v clanker-usage >/dev/null && ok "clanker-usage" || echo "[SKIP] clanker-usage (usage overview falls back to typed-in readings)"
 
 step "9/11 PAL MCP server (OpenRouter / DeepSeek bridge)"
 PAL="$HOME/pal-mcp-server"
 [ -d "$PAL/.git" ] || git clone https://github.com/BeehiveInnovations/pal-mcp-server.git "$PAL"
 cd "$PAL" && [ -x .pal_venv/bin/python ] || uv venv --python 3.12 .pal_venv
-uv pip install --python "$PAL/.pal_venv/bin/python" -r "$PAL/requirements.txt" "mcp>=1.0,<2" >/dev/null \
+busy "installing PAL's Python packages (1-3 min)" uv pip install --python "$PAL/.pal_venv/bin/python" -r "$PAL/requirements.txt" "mcp>=1.0,<2" \
   && ok "PAL installed (keys are added in step 4)" || fail "PAL install"
 
 step "10/11 Codex plugin for Claude Code (optional)"
-claude plugin marketplace add openai/codex-plugin-cc >/dev/null 2>&1
-claude plugin install codex@openai-codex >/dev/null 2>&1
+busy "adding the Codex plugin source" claude plugin marketplace add openai/codex-plugin-cc
+busy "installing the Codex plugin" claude plugin install codex@openai-codex
 claude plugin list 2>&1 | grep -q "codex@openai-codex" && ok "codex plugin" || echo "[SKIP] codex plugin (optional)"
 
 step "Extra: taste-skill plugin for Claude Code (design for websites and app screens)"
-claude plugin marketplace add Leonxlnx/taste-skill >/dev/null 2>&1
-claude plugin install taste-skill@taste-skill >/dev/null 2>&1
+busy "adding the taste-skill source" claude plugin marketplace add Leonxlnx/taste-skill
+busy "installing taste-skill" claude plugin install taste-skill@taste-skill
 claude plugin list 2>&1 | grep -q "taste-skill" && ok "taste-skill plugin" || echo "[SKIP] taste-skill plugin (retry after logging in to Claude Code)"
 
 step "11/11 Shared worker rules (Codex, Claude Code, opencode)"

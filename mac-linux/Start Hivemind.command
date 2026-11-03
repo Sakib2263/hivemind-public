@@ -2,6 +2,7 @@
 # Open this before you start working: starts the relay (so Claude can use the free workers) and, on a Mac,
 # the live usage view in a second window. Leave this window open while you work (Ctrl+C stops the relay).
 cd "$(dirname "$0")" && ARG1="$1" && . ./_env.sh
+python3 ./scripts/providers.py status; echo   # which workers are connected, and how to add a missing one
 h="$(cat relay/heartbeat 2>/dev/null)"
 if [ -n "$h" ] && [ $(( $(date +%s) - h )) -lt 60 ]; then echo "The relay is already running."; pause_end; exit 0; fi
 [ "$OS" = Darwin ] && open -a Terminal "$HM/mac-linux/shortcuts/20 Usage Live.command"

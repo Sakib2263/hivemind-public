@@ -1,6 +1,6 @@
 # Hivemind: one lead AI, a team of models
 
-_Last updated: 2026-11-03_
+_Last updated: 2026-11-04_
 
 Claude leads: it plans, reviews and decides. Free and low-cost models do most of the building: GLM and
 DeepSeek through opencode, Gemini through Antigravity, Codex with any ChatGPT login. Scripts do the chores
@@ -54,6 +54,7 @@ limits as of November 2026; `Usage` (shortcut 19, or the live window 20) shows y
 | Claude | Pro, $20/month | A 5-hour window plus a weekly cap; Anthropic's guidance is about 45 messages per 5 hours, shared by chats and Claude Code | Enough to lead: plans, reviews, small fixes. Max plans give 5x or 20x |
 | opencode Zen free models (GLM, DeepSeek) | free | Not published; a shared rate limit that pushes back after several long jobs | The main builders. When one is busy, the relay moves to the next |
 | Antigravity (Gemini) | free tier | A weekly agent quota; size not published (it has gone down over time) | Reviews, reading, second opinions |
+| NVIDIA build (build.nvidia.com), optional | free key | Per-minute rate limit, no daily cap published | Extra builders and reviewers (MiniMax, Nemotron) when the Zen models are busy. Not for client or NDA work |
 | OpenRouter free models | free | 20 requests a minute and 50 a day (1,000 a day once you have ever bought 10 USD of credits) | Extra helpers through PAL |
 | Codex | any ChatGPT login | Depends on the ChatGPT plan; small on free | Joins the chains whenever it has quota |
 | Local tools (ComfyUI, ACE-Step, Chatterbox) | free | Your own GPU | Images, clips, music, voice |
@@ -125,17 +126,21 @@ fallback: none           (optional: turn off automatic fallback, or give your ow
 - **Limits:** only folders inside the work folder, 45 min per job, up to 2 jobs at once, never two in the same folder.
 
 ## Free models (opencode)
-Step 3 logs opencode in to OpenCode Zen with your free account key. The two free models are already set in
+Step 3 asks for your free opencode.ai key and gives it to opencode (OpenCode Zen); it is kept as OPENCODE_API_KEY in `secrets\keys.env`. The two free models are already set in
 `config\models.env`: GLM-5.3-Flash (main builder) and DeepSeek V4.1 Flash (second builder, mechanical work).
 Both keep no data and don't train on it. Free periods end: if `5 Check Everything.bat` shows one failing, run
 `opencode models opencode` in Ubuntu (Mac/Linux: a terminal), pick a new id ending in `-free`, and paste it into `config\models.env`.
-Avoid Big Pickle, Flint, MiMo and Nemotron free models for real work: they keep or train on data.
+Avoid the Big Pickle, Flint, MiMo and Nemotron free models on OpenCode Zen for real work: they keep or train on data
+(Nemotron through NVIDIA build, `nv2`, is a separate endpoint: own code only, see ROUTING section 8).
+Optional extra: a free key from build.nvidia.com (`4 Add API Keys`, NVIDIA_API_KEY) adds MiniMax and Nemotron as
+`model: nv` / `nv2`; they join the fallback chains and the review engines. Who gets which job and how the relay
+switches: `templates/routing/models.md`.
 Codex is used whenever it's logged in (any ChatGPT plan). Later: GitHub Copilot or a Google AI Studio key
 fill the `copilot` / `gemini` lines. Don't log ChatGPT or Claude into opencode itself.
 
 ## Rules worth keeping
 - Your Claude subscription login is only used in Claude Code and the Claude app. Never paste it into other tools.
-- Client or NDA work: Claude and Antigravity only, unless you OK the zero-retention GLM/DeepSeek free models. Never OpenRouter free models.
+- Client or NDA work: Claude and Antigravity only, unless you OK the zero-retention GLM/DeepSeek free models. Never OpenRouter free models or NVIDIA build.
 - Never paste API keys into chat. Use `4 Add API Keys.bat`.
 - Start a new chat per task: long chats cost far more tokens.
 
@@ -148,6 +153,8 @@ fill the `copilot` / `gemini` lines. Don't log ChatGPT or Claude into opencode i
 | A free model stops working | Its free period ended: `opencode models opencode`, pick a new `-free` id, update `config\models.env` |
 | PAL "failed to connect" | `windows\shortcuts\7 Fix PAL.bat` |
 | Gemini CLI login refused | Expected: Google retired it. The kit uses Antigravity instead |
+| opencode key won't paste in `3 Log In` | Right-click pastes in the Windows console (Ctrl+V may not). Nothing shows while pasting; after Enter it shows the length saved. Or put it in OPENCODE_API_KEY with `4 Add API Keys` |
+| `3 Log In` keeps the old account | It never logs out. Log out first (Claude Code: `/logout` in `claude`), then log in. All tools: GUIDE.md, workflow H |
 | Login link won't open | Ubuntu can't open your browser: copy the link manually |
 | Codex ignores part of a project's AGENTS.md | Codex stops reading project AGENTS.md files past 32 KiB in total, without a warning. Shorten them |
 | Codex shows the same skill twice | Codex reads both `~/.codex/skills` and `~/.agents/skills`. Keep a skill in one of them only |

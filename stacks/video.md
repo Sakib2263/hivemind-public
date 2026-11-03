@@ -24,8 +24,20 @@ images, ACE-Step music, Chatterbox voice all fit. Run one GPU job at a time.
 | Captions | burned in by the skill | WSL | on by default |
 | Final edit, if needed | DaVinci Resolve or CapCut (owner) | Windows | - |
 
-Paid, only when local can't do it: one hero shot from Kling or Veo (pay per clip), ElevenLabs voice.
+Credits or paid, only when local can't do it: hooks and hero shots in Google Flow (Veo 3.1, see below), then
+Kling (pay per clip), ElevenLabs voice.
 Never Higgsfield-style subscriptions with credits.
+
+## Google Flow (Veo): the owner runs it, nothing to connect
+Flow has no API and no login step in Hivemind; signing in to Antigravity (agy) does not connect it, and no
+relay worker or Claude job ever spends Flow credits. It works as soon as you can open labs.google/flow in your
+browser, signed in with a Google account that has Flow access.
+1. Claude writes `flow.md` in the episode folder: one block per shot with id, model (Fast unless you OK
+   Quality), aspect, 8 s, the prompt, and a start frame from `build/ai/` when a still should lead in.
+2. You make the shots in Flow and download them as `assets/flow/<shot id>.mp4`.
+3. Claude places them in cuts.json like any other footage; the `video` worker renders as usual.
+4. Credits: check them on Flow's own page. Hivemind doesn't track them (they can't be read automatically).
+   Per 8 s Veo 3.1 clip: Lite 10, Fast 20, Quality 100 credits.
 
 ## Setup (once)
 1. `9 Optional - Video Studio.bat`: setup window, pick the install folder (outside hivemind, saved in
@@ -43,6 +55,8 @@ Never Higgsfield-style subscriptions with credits.
   scenes.js        scene drawing code
   shots.json       AI stills and clips (optional)
   assets/          logo, voice.wav, music, screenshots, real footage
+  flow.md          Google Flow shot pack (optional; you make the shots)
+  assets/flow/     Flow clips you downloaded, named <shot id>.mp4
   build/ai/        ComfyUI results  (comfy worker)
   build/out/       finished MP4s    (video worker)
 ```

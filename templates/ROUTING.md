@@ -6,10 +6,10 @@ Model names: `config/models.env`. Worker rules: `rules/AGENTS-floor.md`. Checks:
 **Plan policy (October 29, 2026): free tiers first.**
 - Paid: Claude Pro only (the lead). Its quota is the scarcest thing in the system.
 - Free: Antigravity (Gemini), opencode with OpenCode Zen free models (GLM-5.3-Flash, DeepSeek V4.1 Flash),
-  OpenRouter free models through PAL (optional).
+  OpenRouter free models through PAL (optional), NVIDIA build free endpoints (MiniMax, Nemotron; optional key).
 - Every provider that can run is used, paid plan or not: Codex (any ChatGPT login, free included), DeepSeek and
   others sit in the fallback chains. One that isn't logged in, has no key or is out of quota fails in seconds,
-  and the relay skips it for an hour. Never leave a provider out just because it's on a free tier.
+  and the relay skips it for an hour (NVIDIA: 5 min, its limits are per minute). Never leave a provider out just because it's on a free tier.
 - A plan or key added later: move that provider earlier in the chains in `config/models.env`.
 
 **Mac/Linux:** shortcut names in these rules are the Windows `.bat` ones. On Mac/Linux the same number and name is
@@ -29,10 +29,13 @@ Example: `feature · Sonnet · opencode + review + gate build · level select sc
 |---|---|---|---|---|
 | plan | new game or big feature, economy, save format, architecture, unclear request | Claude Opus, owner approves | none, wait for Claude | owner |
 | core | save/load, coins and economy, IAP and ads, netcode, shared engine | opencode free (GLM) drafts; Claude (Sonnet) reads every line and fixes. Claude writes it only after two failed drafts | opencode free2 | `review` worker + gate security when money, accounts or saves |
-| feature | settled spec, a few files, easy to undo | opencode free (GLM) | free2 (DeepSeek) > Antigravity | `review` (Antigravity) + Claude skims `.last` and `.git` |
-| mechanical | renames, level/data tables, configs, boilerplate, test cases, text strings | opencode free2 (DeepSeek) | free (GLM) > Antigravity | Claude spot-checks `.git` stat |
-| read | big folders, docs, logs, "how does X work" | graph question first, then Antigravity | Antigravity hard > opencode free | none |
-| second opinion | a bug still open after two tries | Antigravity hard (Gemini Pro) | opencode free | Claude |
+| feature | settled spec, a few files, easy to undo | opencode free (GLM) | free2 (DeepSeek) > nv (MiniMax) > nv2 > Antigravity | `review` (Antigravity) + Claude skims `.last` and `.git` |
+| mechanical | renames, level/data tables, configs, boilerplate, test cases, text strings | opencode free2 (DeepSeek) | free (GLM) > nv > nv2 > Antigravity | Claude spot-checks `.git` stat |
+| read | big folders, docs, logs, "how does X work" | graph question first, then Antigravity | Antigravity hard > nv2 (Nemotron) > opencode free | none |
+| second opinion | a bug still open after two tries | Antigravity hard (Gemini Pro) | nv2 > opencode free | Claude |
+
+Allocation, parallel jobs, cross-vendor review picks and how the switch works: `templates/routing/models.md`
+(read it before dispatching a batch of more than two jobs, or when a model keeps failing).
 
 Rules:
 - Save Claude: other providers' quota is used first. Anything a free worker can do goes to a free worker.
@@ -57,7 +60,7 @@ Rules:
 |---|---|---|
 | Sprites, icons, backgrounds, store art | ComfyUI FLUX schnell (`comfy` worker); prompts and specs from the `game-asset-designer` skill | Free, local GPU. Sizes: `scripts/check-store-assets.py` |
 | Video clips, B-roll | ComfyUI Wan 2.2 5B (`comfy`) | Free |
-| Hooks and hero shots | Google Flow, Veo 3.1 Fast (owner runs it) | Credits: Quality (100) only with the owner's OK |
+| Hooks and hero shots | Google Flow, Veo 3.1 Fast (owner runs it in the browser; Claude writes the episode's `flow.md` shot pack, `stacks/video.md`) | Credits: Quality (100) only with the owner's OK. No job spends Flow credits |
 | Motion graphics, captions, explainers | `motion-video-producer` skill (`video` worker) | Free |
 | Music, jingles | ACE-Step (`15 Start Music Studio`) | Free |
 | Voiceover | Chatterbox clone (`16 Clone Voice`) | Free, owner's own voice |
@@ -95,7 +98,7 @@ Constraints: <project extras only; usually none>
 
 | worker | Extra header | Notes |
 |---|---|---|
-| opencode | model: free (GLM) / free2 (DeepSeek) / a model id | Main builder. Free models through OpenCode Zen |
+| opencode | model: free (GLM) / free2 (DeepSeek) / nv (MiniMax) / nv2 (Nemotron) / a model id | Main builder. Zen free models; nv/nv2 = NVIDIA build (optional key) |
 | agy | model: hard (optional) | Antigravity (Gemini): reading, second opinions, reviews |
 | review | base: main, or commit: <sha> (optional) | Reviews uncommitted changes with `gates/review.md`. Engines: REVIEW_ENGINES |
 | gate | gate: build / security / release | Runs `gates/<gate>.md`. Engines: GATE_ENGINES |
@@ -139,7 +142,7 @@ directly for reading and planning help.
 |---|---|
 | Our own games and code | every worker |
 | Company work (your company / Your Studio, no client NDA) | Claude, Antigravity (work Google account), opencode GLM and DeepSeek free (zero data retention) |
-| Client or NDA work | Claude and Antigravity. opencode GLM/DeepSeek free only if the owner OKs it. Never OpenRouter free or Zen models that train on data (Big Pickle, Flint, MiMo, Nemotron) |
+| Client or NDA work | Claude and Antigravity. opencode GLM/DeepSeek free only if the owner OKs it. Never OpenRouter free, NVIDIA build (nv, nv2) or Zen models that train on data (Big Pickle, Flint, MiMo, Nemotron) |
 | A contract that bans AI tools | nothing: no AI on it at all, not even anonymised |
 | API keys, passwords, player or customer personal data | never in a prompt, file or log |
 
@@ -158,6 +161,7 @@ switching engines is a plan-class decision for Opus and the owner.
 ## 9. Read only when the task needs it
 | Task | File |
 |---|---|
+| Batch of jobs, model choice, a model keeps failing | `templates/routing/models.md` |
 | Android APK or Play release | `templates/routing/android.md` |
 | Security fixes, reverse engineering (REA) | `templates/routing/security.md` |
 | Autopilot steps | `templates/routing/autopilot.md` |

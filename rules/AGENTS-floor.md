@@ -20,6 +20,10 @@ If the task or plan looks wrong, stop and say so as a blocker in your final mess
 - A deliberate shortcut gets a `// shortcut: <limit>, upgrade when <trigger>` comment.
 - No new dependency for something a few lines or the platform already does.
 
+## Limits
+- Hit a rate limit, quota or login error? Stop at once and end with `Blockers / questions: rate limit (<provider message>)`.
+  Don't wait, retry in a loop or switch tools yourself: the relay moves the job to the next model.
+
 ## Git
 - Do not commit, push or switch branches. Leave changes uncommitted. The lead reviews, then commits.
 

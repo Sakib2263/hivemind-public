@@ -4,6 +4,8 @@
 # Started by "6 Optional - Android Build Tools.bat".
 KIT="$(cd "$(dirname "$0")/.." && pwd)"
 exec > >(tee "$KIT/logs/android-setup.log") 2>&1
+. "$KIT/scripts/progress.sh"   # busy: live timer for the quiet steps
+echo "Installing Android build tools: 1-2 GB, about 5 to 15 minutes. Each step shows progress or a live timer."
 SDK="$HOME/android-sdk"
 ok() { echo "[OK]   $*"; }; fail() { echo "[FAIL] $*"; FAILED=1; }
 
@@ -37,8 +39,8 @@ export ANDROID_HOME="$SDK"; export PATH="$SDK/cmdline-tools/latest/bin:$SDK/plat
 ok "ANDROID_HOME=$ANDROID_HOME"
 
 echo; echo "=== 4/4 SDK packages (accepts the Android SDK licences) ==="
-yes | sdkmanager --licenses >/dev/null 2>&1
-sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0" >/dev/null && ok "platform-tools, android-36, build-tools 36" || fail "SDK packages"
+busy "accepting the SDK licences" bash -c 'yes | sdkmanager --licenses'
+busy "downloading SDK packages (about 1 GB)" sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0" && ok "platform-tools, android-36, build-tools 36" || fail "SDK packages"
 command -v adb >/dev/null && ok "$(adb version | head -1)" || fail "adb"
 
 echo; [ -z "$FAILED" ] && echo "ALL OK. Build with windows\shortcuts\\10 Build Android App.bat" || echo "Something failed: send logs\\android-setup.log to Claude."

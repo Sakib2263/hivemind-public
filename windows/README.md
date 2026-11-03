@@ -17,8 +17,8 @@ In this `windows` folder, run these in order. Each window tells you the next ste
 | 1 | `1 Install WSL (run once).bat` | Installs WSL2 + Ubuntu (asks for admin) | Restart PC, open "Ubuntu" from Start, create a lowercase username + password |
 | 0 | `0 Optional - Move Ubuntu to another drive.bat` | Moves Ubuntu off C: | Only if C: has under 15 GB free |
 | 2 | `2 Install AI Tools.bat` | Installs Claude Code, Antigravity, opencode, graphify, PAL, Codex (optional), the shared worker rules and skills (10-20 min) | Type your Ubuntu password at the start |
-| 3 | `3 Log In.bat` | Logs in to Claude, Antigravity, opencode, then Codex (optional) one by one | Copy each link into your browser and approve. For opencode: make a free account at opencode.ai, copy its API key, pick "OpenCode Zen" and paste it. Type s to skip Codex |
-| 4 | `4 Add API Keys.bat` | Opens `secrets\keys.env` in Notepad, then connects PAL | Optional: paste a free OpenRouter key, save, close Notepad |
+| 3 | `3 Log In.bat` | Logs in to Claude, Antigravity, opencode, then Codex (optional) one by one | Copy each link into your browser and approve. For opencode: make a free account at opencode.ai, copy its API key and paste it when asked (right-click pastes; nothing shows until Enter). Type s to skip Codex |
+| 4 | `4 Add API Keys.bat` | Opens `secrets\keys.env` in Notepad, then connects the keys | Optional: paste free keys (opencode.ai, build.nvidia.com, OpenRouter), save, close Notepad |
 | 5 | `5 Check Everything.bat` | Tests every tool; both free models and Antigravity reply "OK" | Read the result; send `logs\verify.log` to Claude if something fails |
 | 6 | `6 Optional - Android Build Tools.bat` | Installs Java 21, the Android SDK and adb (1-2 GB) | Only if you build Android apps |
 | 7 | `7 Connect Claude.bat` | Writes your Claude Project instructions with your folders filled in, copies them, opens them | Paste into a Claude Project's instructions (Projects > New project > Instructions) |

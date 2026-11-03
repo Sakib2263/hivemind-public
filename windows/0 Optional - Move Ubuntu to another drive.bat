@@ -3,6 +3,7 @@ title Optional - Move Ubuntu off the C: drive
 rem Use if C: has little free space. Run after step 1, before step 2.
 set /p "TARGET=Folder to move Ubuntu to (e.g. D:\WSL\Ubuntu): "
 if "%TARGET%"=="" exit /b
+echo Moving Ubuntu: this takes 5 to 20 minutes and Windows shows no progress. Leave this window open.
 wsl.exe --shutdown
 wsl.exe --manage Ubuntu --move "%TARGET%"
 echo.

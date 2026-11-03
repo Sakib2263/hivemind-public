@@ -15,17 +15,19 @@ echo "Open the link, sign in, paste the code back. Then type /quit (or press Ctr
 pause && agy
 
 echo; echo "=== 3/4 opencode (free models through OpenCode Zen) - needed ==="
-echo "Make a free account at opencode.ai, copy your API key there, then pick 'OpenCode Zen'"
-echo "below and paste the key. Add no other providers or keys (free-only setup)."
-pause && opencode auth login
+KIT="$(cd "$(dirname "$0")/.." && pwd)"
+echo "Make a free account at opencode.ai and copy your API key there (opencode.ai > API keys)."
+echo "Paste it below: right-click pastes in a Windows console (Ctrl+V may not). Nothing shows while you paste;"
+echo "after Enter you see how many characters were saved. Already set and want to keep it? Type s to skip."
+if pause; then
+  python3 "$KIT/scripts/providers.py" set OPENCODE_API_KEY && python3 "$KIT/scripts/providers.py" opencode-auth \
+    || { echo "Or use opencode's own login: pick 'OpenCode Zen' and paste the key."; opencode auth login; }
+fi
 
-echo; echo "=== 4/4 Codex (only if you have a paid ChatGPT plan) - optional ==="
-echo "No ChatGPT plan? Type s to skip. The free models do Codex's work until then."
+echo; echo "=== 4/4 Codex (any ChatGPT login, free works) - optional ==="
+echo "No ChatGPT account? Type s to skip. The free models do Codex's work until then."
 if pause; then codex login || codex login --device-auth; fi
 
-echo; echo "=== Login check ==="
-[ -f "$HOME/.claude/.credentials.json" ] && echo "Claude: logged in" || echo "Claude: NOT logged in"
-[ -d "$HOME/.gemini/antigravity-cli" ] && echo "Antigravity: logged in" || echo "Antigravity: check needed"
-opencode auth list 2>/dev/null | grep -qi "opencode\|zen" && echo "opencode: logged in" || echo "opencode: check needed (run: opencode auth list)"
-codex login status 2>/dev/null | head -1 | sed 's/^/Codex: /' || true
+echo
+python3 "$KIT/scripts/providers.py" status
 echo; echo "Next: double-click '4 Add API Keys.bat' (optional, for OpenRouter free models), then '5 Check Everything.bat'."

@@ -6,7 +6,7 @@
 # Job file: relay/inbox/<id>.job
 #   worker: opencode | agy | review | gate | graph | git-commit | android | files | upload | install | comfy | video   (codex, codex-review, deepseek: when those plans/keys exist)
 #   dir:    <project folder in WSL form>   (must be inside the work folder that holds this kit)
-#   model:  opencode: free | free2 | <model id>.  agy: hard.  gate/review: engine list, e.g. "agy opencode:free"
+#   model:  opencode: free | free2 | nv | nv2 | <model id>.  agy: hard.  gate/review: engine list, e.g. "agy opencode:free"
 #   gate:   build | security | release     (gate only, see gates/)
 #   base:   main  / commit: <sha>          (review only; default = uncommitted changes)
 #   effort: medium                         (codex only)
@@ -85,6 +85,8 @@ oc_model() {  # opencode model shortcut -> model id
   case "$1" in
     ""|free) echo "$OPENCODE_FREE_MODEL" ;;
     free2) echo "$OPENCODE_FREE2_MODEL" ;;
+    nv) echo "$NVIDIA_MODEL" ;;
+    nv2) echo "$NVIDIA_MODEL2" ;;
     copilot) echo "$OPENCODE_COPILOT_MODEL" ;;
     gemini) echo "$OPENCODE_GEMINI_MODEL" ;;
     *) echo "$1" ;;
@@ -94,6 +96,8 @@ oc_model() {  # opencode model shortcut -> model id
 oc_run() {  # $1 model shortcut or id, $2 prompt
   local m; m="$(oc_model "$1")"
   if [ -z "$m" ]; then echo "model unavailable: no model set for '${1:-free}' in config/models.env (list ids: opencode models opencode)"; return 1; fi
+  if [[ "$m" == nvidia/* ]] && ! grep -q '"nvidia"' "${XDG_DATA_HOME:-$HOME/.local/share}/opencode/auth.json" 2>/dev/null; then
+    echo "model unavailable: no NVIDIA key (optional: build.nvidia.com, then 4 Add API Keys)"; return 1; fi
   # Stall watchdog: stop when there's no new output and no file change in the project for OPENCODE_IDLE_SECONDS
   # (default 6 min), or after OPENCODE_MAX_SECONDS in total. Exit 124 = stalled; the next model in the chain tries.
   local log mark pid idle=0 t=0 last=-1 size
@@ -219,18 +223,22 @@ attempt() {  # one try: $1 worker  $2 model (for gate/review: engine[:model])  -
 }
 
 # A failure that means "this model can't take the job right now", so the next one in the chain should try.
-LIMIT_PATTERN='rate.?limit|429|quota|usage limit|limit reached|too many requests|unauthori[sz]ed|401|not logged in|login required|insufficient|credit|billing|command not found|model unavailable|not (found|available|supported)|overloaded|503'
+# Matched on the last 40 lines only, and only provider-style messages: a build error such as "module not found" in
+# the worker's own work must be reported, not hidden behind another model (and must not bench that model for an hour).
+LIMIT_PATTERN='rate.?limit|(http|status|code|error)[^a-z0-9]{0,3}429|quota|usage limit|limit reached|too many requests|unauthori[sz]ed|not logged in|login required|insufficient (credit|balance|funds|quota)|out of credits|billing|command not found|model unavailable|model.{0,40}(not found|not available|not supported|does not exist)|ProviderModelNotFound|overloaded|(http|status|code|error)[^a-z0-9]{0,3}503|service unavailable'
+is_limit() { tail -n 40 "$1" | grep -qiE "$LIMIT_PATTERN"; }   # $1 = output file of one try
 
 log_usage() {  # one line per model try in logs/usage-ledger.csv (read by scripts/usage.py). $1 id $2 worker $3 spec $4 code $5 start
   case "$2" in graph|git-commit|android|files|upload|install|comfy|video) return ;; esac   # scripts, no model quota
   local lim=0 spec="$3"; [ "$spec" = opencode ] && spec="opencode:free"
-  { [ "$4" -eq 124 ] || { [ "$4" -ne 0 ] && grep -qiE "$LIMIT_PATTERN" "$res.try"; }; } && lim=1   # limit or stall
+  { [ "$4" -eq 124 ] || [ "$4" -eq 75 ] || { [ "$4" -ne 0 ] && is_limit "$res.try"; }; } && lim=1   # limit or stall
   echo "$(date +%s),$1,$(basename "$real" | tr ',' ' '),$2,$spec,$4,$(( $(date +%s) - $5 )),$lim" >> "$ROOT/logs/usage-ledger.csv"
 }
 
-recently_stuck() {  # $1 spec: hit a limit or stalled in the last SKIP_STUCK_MINUTES (default 60)
-  local s="$1" f="$ROOT/logs/usage-ledger.csv"; [ "$s" = opencode ] && s="opencode:free"
-  [ -f "$f" ] && awk -F, -v s="$s" -v c="$(( $(date +%s) - ${SKIP_STUCK_MINUTES:-60} * 60 ))" \
+recently_stuck() {  # $1 spec: hit a limit or stalled in the last SKIP_STUCK_MINUTES (default 60; NVIDIA: 5, per-minute limits)
+  local s="$1" f="$ROOT/logs/usage-ledger.csv" mins="${SKIP_STUCK_MINUTES:-60}"; [ "$s" = opencode ] && s="opencode:free"
+  [[ "$s" == opencode:nv* ]] && mins="${SKIP_STUCK_MINUTES_NVIDIA:-5}"
+  [ -f "$f" ] && awk -F, -v s="$s" -v c="$(( $(date +%s) - mins * 60 ))" \
     '$5 == s && $1 >= c && $8 == 1 { hit = 1 } END { exit !hit }' "$f"
 }
 
@@ -246,7 +254,8 @@ run_job() {  # runs in the background, one per job
     gate)   chain="${model:-$GATE_ENGINES}" ;;
     review) chain="${model:-$REVIEW_ENGINES}" ;;
     graph|git-commit|android|files|upload|install|comfy|video) chain="$worker" ;;
-    *)      chain="$worker${model:+:$model} ${fallback:-${!fbvar}}" ;;
+    *)      local first="$worker${model:+:$model}"; [ "$first" = opencode ] && first="opencode:free"   # so GLM is never tried twice
+            chain="$first ${fallback:-${!fbvar}}" ;;
   esac
   [ "$fallback" = "none" ] && chain="${chain%% *}"
 
@@ -264,10 +273,12 @@ run_job() {  # runs in the background, one per job
     rm -f "$res.last"; echo "=== try: $spec" >> "$res.out"
     local t0; t0="$(date +%s)"
     attempt "$w" "$m" > "$res.try"; code=$?
+    # a worker that stopped on a provider limit says so (rules/AGENTS-floor.md, "Limits"): treat it as a limit
+    [ "$code" -eq 0 ] && tail -n 40 "$res.try" | grep -qiE '^[^a-z]*blockers?[^:]*:[[:space:]]*(rate limit|quota)' && code=75
     cat "$res.try" >> "$res.out"; used="$spec"
     log_usage "$id" "$worker" "$spec" "$code" "$t0"
     [ "$code" -eq 0 ] && break
-    [ "$code" -eq 127 ] || [ "$code" -eq 124 ] || grep -qiE "$LIMIT_PATTERN" "$res.try" || break   # 124 = timed out (stalled model)   # 127 = tool not installed   # a real failure: report it, don't hide it behind another model
+    [ "$code" -eq 127 ] || [ "$code" -eq 124 ] || [ "$code" -eq 75 ] || is_limit "$res.try" || break   # 124 = timed out (stalled model)   # 127 = tool not installed   # a real failure: report it, don't hide it behind another model
     echo "=== $spec is out of quota or unavailable; trying the next one" >> "$res.out"
   done
   [ -s "$res.last" ] || tail -n 60 "$res.try" > "$res.last" 2>/dev/null

@@ -17,6 +17,8 @@ are welcome.
 - Windows launchers live in `windows/`, Mac/Linux launchers in `mac-linux/`. A change to a shared script
   (`scripts/`) must keep working on all three systems; put OS-specific parts behind an OS check.
 - Plain language in docs and messages: short sentences, no jargon.
+- A window must never look stuck. Anything that takes more than a few seconds says what it is doing and roughly
+  how long, and quiet commands run through `busy` from `scripts/progress.sh` (live spinner and timer).
 - By opening a pull request you agree that your contribution is shared under the same license (`LICENSE`).
 
 ## Reporting a problem

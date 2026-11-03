@@ -1,7 +1,9 @@
 # Usage overlay: a small always-on-top window showing what's left per provider and model.
 # Started by windows\shortcuts\20 Usage Overlay.bat. Shows USAGE.json (made by scripts/usage.py) and refreshes it
 # through WSL every 5 minutes; the relay also refreshes it after every job.
-# Drag to move. The - / + button (or right-click > Minimise) folds it to one line. Right-click: Refresh now, Open full report, Start with Windows, Close.
+# Three views: simple (each provider and % left), detailed (every window, reset times, not connected list) and
+# minimised (one line). Header buttons: minimise, detailed view, close. Drag to move. Right-click: Refresh now,
+# Open full report, Start with Windows, Close.
 Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
 try { $Host.UI.RawUI.WindowTitle = 'Hivemind usage window (close it from its right-click menu)' } catch { }   # if a console ever shows, it has a name
 try {   # hide this script's own console window, if there is one
@@ -12,8 +14,10 @@ $Root    = Split-Path -Parent $PSScriptRoot
 $Json    = Join-Path $Root 'USAGE.json'
 $Report  = Join-Path $Root 'USAGE.md'
 $PosFile = Join-Path $Root 'logs\overlay-pos.txt'
-$StateFile = Join-Path $Root 'logs\overlay-state.txt'   # "compact" = minimised to one line
-$script:Compact = (Test-Path $StateFile) -and ((Get-Content $StateFile -Raw).Trim() -eq 'compact')
+$StateFile = Join-Path $Root 'logs\overlay-state.txt'   # view and minimised state, remembered for next time
+$st = if (Test-Path $StateFile) { (Get-Content $StateFile -Raw).Trim() } else { '' }
+$script:Compact = $st -like 'compact*'
+$script:Detailed = $st -like '*detailed' -or $st -eq 'full'   # 'full' = detailed, from before the simple view
 $Bat     = Join-Path $Root 'windows\Start Hivemind.bat'   # what Start with Windows launches: relay + this window
 $Startup = Join-Path ([Environment]::GetFolderPath('Startup')) 'Hivemind Usage Overlay.lnk'
 
@@ -59,54 +63,129 @@ $border.Background = New-Object System.Windows.Media.SolidColorBrush ([System.Wi
 $stack = New-Object System.Windows.Controls.StackPanel
 $border.Child = $stack; $w.Content = $border
 
-function Toggle {   # minimise to one line, or expand again; remembered for next time
-    $script:Compact = -not $script:Compact
-    try { $(if ($script:Compact) { 'compact' } else { 'full' }) | Set-Content $StateFile } catch { }
-    Render
+function Save-State { try { "$(if ($script:Compact) { 'compact-' } else { '' })$(if ($script:Detailed) { 'detailed' } else { 'simple' })" | Set-Content $StateFile } catch { } }
+function Toggle { $script:Compact = -not $script:Compact; Save-State; Render }               # minimise / expand
+function Toggle-View { $script:Detailed = -not $script:Detailed; $script:Compact = $false; Save-State; Render }   # simple / detailed
+
+function Btn($glyph, $tip, $action, $on = $false) {   # header icon button (Segoe MDL2 Assets, on every Windows 10/11)
+    $b = New-Object System.Windows.Controls.TextBlock
+    $b.Text = [string][char]$glyph; $b.FontFamily = 'Segoe MDL2 Assets'; $b.FontSize = 11; $b.Padding = '6,3,6,3'
+    $b.Foreground = Brush $(if ($on) { '#58A6FF' } else { '#C9D1D9' }); $b.VerticalAlignment = 'Center'
+    $b.Cursor = 'Hand'; $b.ToolTip = $tip; $b.Background = [System.Windows.Media.Brushes]::Transparent
+    $b.Add_MouseEnter({ param($s) $s.Background = Brush '#30363D' }); $b.Add_MouseLeave({ param($s) $s.Background = [System.Windows.Media.Brushes]::Transparent })
+    $b.Add_PreviewMouseLeftButtonDown($action)   # handled there, so the click doesn't start a window drag
+    $b
+}
+function Buttons($panel) {
+    $g = New-Object System.Windows.Controls.StackPanel; $g.Orientation = 'Horizontal'; $g.Margin = '6,0,0,0'
+    [void]$g.Children.Add((Btn $(if ($script:Compact) { 0xE923 } else { 0xE921 }) $(if ($script:Compact) { 'Expand' } else { 'Minimise to one line' }) { param($s, $e) $e.Handled = $true; Toggle }))
+    [void]$g.Children.Add((Btn 0xE8FD $(if ($script:Detailed) { 'Simple view' } else { 'Detailed view' }) { param($s, $e) $e.Handled = $true; Toggle-View } $script:Detailed))
+    [void]$g.Children.Add((Btn 0xE8BB 'Close (Start Hivemind or 20 Usage Overlay opens it again)' { param($s, $e) $e.Handled = $true; $w.Close() }))
+    [void]$panel.Children.Add($g)
+}
+
+# simple view: one line per provider, the tightest window's % left
+$Short = [ordered]@{ 'Claude Pro (lead)' = 'Claude'; 'opencode GLM (free)' = 'GLM (opencode)'; 'opencode DeepSeek (free2)' = 'DeepSeek (opencode)';
+                     'NVIDIA MiniMax (nv)' = 'MiniMax (NVIDIA)'; 'NVIDIA Nemotron (nv2)' = 'Nemotron (NVIDIA)';
+                     'Antigravity (Gemini)' = 'Gemini (Antigravity)'; 'OpenRouter free (PAL)' = 'OpenRouter'; 'Codex' = 'Codex' }
+function Simple-Rows($d) {
+    $missing = @($d.providers | Where-Object { $_.needed -and $_.status -ne 'ok' } | ForEach-Object { $_.provider })
+    $off = @{}; if ($missing -like 'opencode*') { $off['GLM (opencode)'] = 1; $off['DeepSeek (opencode)'] = 1 }
+    if ($missing -like 'Antigravity*') { $off['Gemini (Antigravity)'] = 1 }
+    $out = @()
+    $groups = @{}; foreach ($g in ($d.rows | Group-Object provider)) { $groups[$g.Name] = $g }
+    $order = @($Short.Keys)
+    foreach ($grp in ($order | Where-Object { $groups.ContainsKey($_) } | ForEach-Object { $groups[$_] })) {
+        $name = if ($Short.Contains($grp.Name)) { $Short[$grp.Name] } else { $null }
+        if (-not $name) { continue }   # Claude Code tokens, Antigravity job counts: detailed view only
+        $withPct = @($grp.Group | Where-Object { $null -ne $_.pct } | Sort-Object { [double]$_.pct } -Descending)
+        $r = if ($withPct.Count) { $withPct[0] } else { $grp.Group[0] }
+        $hit = $grp.Group | Where-Object { $_.status -like 'LIMIT*' } | Select-Object -First 1
+        if ($off[$name]) { $txt = 'not connected'; $col = '#E5534B' }
+        elseif ($hit) { $txt = $hit.status.ToLower(); $col = '#E5534B' }
+        elseif ($null -ne $r.pct) { $txt = '{0:0}% left' -f [math]::Max(0, 100 - [double]$r.pct); $col = StatusColor $r }
+        elseif ($r.left -match 'jobs|no published') { $txt = 'free'; $col = '#3FB950' }
+        else { $txt = 'not read'; $col = '#8B949E' }
+        $out += [pscustomobject]@{ name = $name; text = $txt; color = $col; pct = $r.pct; tip = "$($grp.Name): $($r.window), used $($r.used), left $($r.left)" }
+    }
+    foreach ($p in ($d.providers | Where-Object { $_.needed -and $_.status -ne 'ok' -and $_.provider -notlike 'opencode*' -and $_.provider -notlike 'Antigravity*' })) {
+        $out += [pscustomobject]@{ name = $p.provider; text = 'not connected'; color = '#E5534B'; pct = $null; tip = "To add: $($p.fix)" }
+    }
+    $out
+}
+
+function Bar($pct, $c) {
+    $bar = New-Object System.Windows.Controls.Border
+    $bar.Width = 70; $bar.Height = 6; $bar.CornerRadius = 3; $bar.Background = Brush '#30363D'; $bar.Margin = '0,0,8,0'
+    if ($null -ne $pct) {
+        $fill = New-Object System.Windows.Controls.Border
+        $fill.Width = [math]::Max(2, 70 * [math]::Min(100, [double]$pct) / 100); $fill.HorizontalAlignment = 'Left'
+        $fill.CornerRadius = 3; $fill.Background = Brush $c; $bar.Child = $fill
+    } else { $bar.Opacity = 0.3 }
+    $bar
 }
 
 function Render {
     $stack.Children.Clear()
     $d = $null
     try { $d = Get-Content $Json -Raw -Encoding UTF8 | ConvertFrom-Json } catch { }
-    $head = New-Object System.Windows.Controls.StackPanel; $head.Orientation = 'Horizontal'; $head.Margin = '0,0,0,6'
-    [void]$head.Children.Add((Text 'Usage left' '#E6EDF3' 13 0 $true))
-    if (-not $d) { [void]$head.Children.Add((Text 'loading...' '#8B949E' 11)); [void]$stack.Children.Add($head); return }
+    $head = New-Object System.Windows.Controls.DockPanel; $head.Margin = '0,0,0,6'; $head.LastChildFill = $true
+    $right = New-Object System.Windows.Controls.StackPanel; $right.Orientation = 'Horizontal'
+    [System.Windows.Controls.DockPanel]::SetDock($right, 'Right'); [void]$head.Children.Add($right)
+    $left = New-Object System.Windows.Controls.StackPanel; $left.Orientation = 'Horizontal'; [void]$head.Children.Add($left)
+    [void]$left.Children.Add((Text 'Usage left' '#E6EDF3' 13 0 $true))
+    if (-not $d) { [void]$left.Children.Add((Text 'loading...' '#8B949E' 11)); Buttons $right; [void]$stack.Children.Add($head); return }
     $age = [int]([DateTimeOffset]::Now - (Dto $d.updated)).TotalMinutes
     $note = if ($age -gt 15) { "updated $age min ago" } else { 'updated ' + (Dto $d.updated).ToLocalTime().ToString('HH:mm') }
-    $btn = Text ($(if ($script:Compact) { '+' } else { [string][char]0x2212 })) '#C9D1D9' 14 0 $true
-    $btn.Cursor = 'Hand'; $btn.ToolTip = 'Minimise / expand'; $btn.Padding = '6,0,2,0'
-    $btn.Add_PreviewMouseLeftButtonDown({ param($s, $e) $e.Handled = $true; Toggle })
-    if ($script:Compact) {   # one line: Claude session left + how many rows need attention
-        $cl = $d.rows | Where-Object { $_.provider -like 'Claude Pro*' -and $_.window -like 'session*' } | Select-Object -First 1
+    if ($script:Compact) {   # one line: Claude left + how many need attention
+        $cl = Simple-Rows $d | Where-Object { $_.name -eq 'Claude' } | Select-Object -First 1
         $bad = @($d.rows | Where-Object { $_.status -like 'LIMIT*' -or $_.status -eq 'OUT' -or $_.status -eq 'LOW' })
-        $sum = 'Claude ' + $(if ($cl) { $cl.left } else { '?' }) + $(if ($bad.Count) { "  |  $($bad.Count) need attention" } else { '  |  all ok' })
-        $col = if ($bad | Where-Object { $_.status -like 'LIMIT*' -or $_.status -eq 'OUT' }) { '#E5534B' } elseif ($bad.Count) { '#D29922' } else { '#3FB950' }
-        [void]$head.Children.Add((Text $sum $col 12 0 $true))
-        [void]$head.Children.Add($btn); $head.Margin = '0'
+        $bad += @($d.providers | Where-Object { $_.needed -and $_.status -ne 'ok' })   # a needed worker not connected
+        $sum = 'Claude ' + $(if ($cl) { $cl.text } else { '?' }) + $(if ($bad.Count) { "  |  $($bad.Count) need attention" } else { '  |  all ok' })
+        $col = if ($bad | Where-Object { $_.status -like 'LIMIT*' -or $_.status -eq 'OUT' -or $_.status -like 'not *' }) { '#E5534B' } elseif ($bad.Count) { '#D29922' } else { '#3FB950' }
+        [void]$left.Children.Add((Text $sum $col 12 0 $true))
+        Buttons $right; $head.Margin = '0'
         [void]$stack.Children.Add($head); return
     }
-    [void]$head.Children.Add((Text $note ($(if ($age -gt 15) { '#D29922' } else { '#8B949E' })) 11))
-    [void]$head.Children.Add($btn)
+    [void]$left.Children.Add((Text $note ($(if ($age -gt 15) { '#D29922' } else { '#8B949E' })) 11))
+    Buttons $right
     [void]$stack.Children.Add($head)
+    if (-not $script:Detailed) {
+        foreach ($r in (Simple-Rows $d)) {
+            $line = New-Object System.Windows.Controls.StackPanel; $line.Orientation = 'Horizontal'; $line.Margin = '0,1,0,1'
+            [void]$line.Children.Add((Text $r.name '#C9D1D9' 12 140))
+            [void]$line.Children.Add((Bar $(if ($null -ne $r.pct) { 100 - [double]$r.pct } else { $null }) $r.color))
+            [void]$line.Children.Add((Text $r.text $r.color 12 0 $true))
+            $line.ToolTip = $r.tip
+            [void]$stack.Children.Add($line)
+        }
+        return
+    }
     foreach ($r in $d.rows) {
         $line = New-Object System.Windows.Controls.StackPanel; $line.Orientation = 'Horizontal'; $line.Margin = '0,1,0,1'
         $c = StatusColor $r
         [void]$line.Children.Add((Text ($r.provider -replace ' \(lead\)', '') '#C9D1D9' 12 150))
         [void]$line.Children.Add((Text $r.window '#8B949E' 11 110))
-        $bar = New-Object System.Windows.Controls.Border
-        $bar.Width = 70; $bar.Height = 6; $bar.CornerRadius = 3; $bar.Background = Brush '#30363D'; $bar.Margin = '0,0,8,0'
-        if ($null -ne $r.pct) {
-            $fill = New-Object System.Windows.Controls.Border
-            $fill.Width = [math]::Max(2, 70 * [math]::Min(100, [double]$r.pct) / 100); $fill.HorizontalAlignment = 'Left'
-            $fill.CornerRadius = 3; $fill.Background = Brush $c; $bar.Child = $fill
-        } else { $bar.Opacity = 0.3 }
-        [void]$line.Children.Add($bar)
-        $left = if ($r.status -like 'LIMIT*') { $r.status.ToLower() } else { $r.left }
-        [void]$line.Children.Add((Text $left $c 12 120 $true))
+        [void]$line.Children.Add((Bar $r.pct $c))
+        $lt = if ($r.status -like 'LIMIT*') { $r.status.ToLower() } else { $r.left }
+        [void]$line.Children.Add((Text $lt $c 12 120 $true))
         [void]$line.Children.Add((Text (Until $r.resets) '#8B949E' 11))
         $line.ToolTip = "$($r.provider) $($r.window): used $($r.used), left $($r.left), $($r.status)"
         [void]$stack.Children.Add($line)
+    }
+    $miss = @($d.providers | Where-Object { $_.status -ne 'ok' })   # tools or keys not set up (scripts/providers.py)
+    if ($miss.Count) {
+        [void]$stack.Children.Add((Text 'Not connected' '#E6EDF3' 12 0 $true))
+        foreach ($p in $miss) {
+            $line = New-Object System.Windows.Controls.StackPanel; $line.Orientation = 'Horizontal'; $line.Margin = '0,1,0,1'
+            $c = if ($p.needed) { '#E5534B' } else { '#8B949E' }
+            [void]$line.Children.Add((Text $p.provider '#C9D1D9' 12 150))
+            [void]$line.Children.Add((Text $(if ($p.needed) { 'needed' } else { 'optional' }) '#8B949E' 11 110))
+            [void]$line.Children.Add((Text $p.status $c 12 0 $true))
+            $line.ToolTip = "$($p.provider): $($p.status). To add: $($p.fix)"
+            [void]$stack.Children.Add($line)
+        }
+        [void]$stack.Children.Add((Text 'Hover a line to see how to add it' '#8B949E' 10))
     }
 }
 
@@ -123,6 +202,7 @@ $menu = New-Object System.Windows.Controls.ContextMenu
 function Item($label, $action) { $i = New-Object System.Windows.Controls.MenuItem; $i.Header = $label; $i.Add_Click($action); [void]$menu.Items.Add($i); $i }
 [void](Item 'Refresh now' { Refresh-Data })
 [void](Item 'Minimise / expand' { Toggle })
+[void](Item 'Simple / detailed view' { Toggle-View })
 [void](Item 'Open full report' { if (Test-Path $Report) { Start-Process notepad.exe -ArgumentList "`"$Report`"" } })
 $auto = Item 'Start Hivemind with Windows (relay + this window)' {
     if (Test-Path $Startup) { Remove-Item $Startup -Force }
@@ -135,6 +215,11 @@ $border.ContextMenu = $menu
 
 # position: last place, else bottom-right
 $w.Add_MouseLeftButtonDown({ $w.DragMove() })
+$w.Add_SizeChanged({   # a bigger view near the screen edge: move it back inside
+    $wa = [System.Windows.SystemParameters]::WorkArea
+    if ($w.Left + $w.ActualWidth -gt $wa.Right) { $w.Left = [math]::Max($wa.Left, $wa.Right - $w.ActualWidth - 4) }
+    if ($w.Top + $w.ActualHeight -gt $wa.Bottom) { $w.Top = [math]::Max($wa.Top, $wa.Bottom - $w.ActualHeight - 4) }
+})
 $w.Add_LocationChanged({ try { "$([int]$w.Left),$([int]$w.Top)" | Set-Content $PosFile } catch { } })
 $w.Add_Loaded({
     $p = if (Test-Path $PosFile) { (Get-Content $PosFile -Raw).Trim() -split ',' } else { $null }
