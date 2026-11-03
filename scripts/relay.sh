@@ -4,7 +4,7 @@
 # Start once in an Ubuntu window and leave it open (Ctrl+C to stop): windows\shortcuts\1 Start Relay.bat
 #
 # Job file: relay/inbox/<id>.job
-#   worker: opencode | agy | review | gate | graph | git-commit | android | files | upload | install | comfy | video   (codex, codex-review, deepseek: when those plans/keys exist)
+#   worker: opencode | agy | review | gate | graph | git-commit | android | files | upload | install | comfy | video | assets   (codex, codex-review, deepseek: when those plans/keys exist)
 #   dir:    <project folder in WSL form>   (must be inside the work folder that holds this kit)
 #   model:  opencode: free | free2 | nv | nv2 | <model id>.  agy: hard.  gate/review: engine list, e.g. "agy opencode:free"
 #   gate:   build | security | release     (gate only, see gates/)
@@ -15,6 +15,7 @@
 #   <handoff: Task / Scope / Start from / Done when>  (git-commit: one-line message; graph: "update" or a question; android: debug or release)
 #   files: one "delete <path>" per line.  upload: line 1 file path, line 2 signed https amazonaws.com PUT url.
 #   install: apk path (empty = newest builds/android/*.apk), installed on the USB phone with Windows adb.
+#   assets: one scripts/assets.py command per line (scan, add, peek, find, list, copy, index): the shared asset library.
 #   files, upload, install, git-commit and android are plain scripts: no AI model, instant, never stall.
 #
 # Automatic fallback: when a model fails because of a limit, quota, login or missing tool, the relay tries the
@@ -46,7 +47,7 @@ allowed_dir() {  # inside the work folder or a folder from config/folders.env, a
 MAX_SECONDS=2700                    # 45 min per job
 MAX_JOBS="${RELAY_MAX_JOBS:-2}"
 export HIVEMIND="$ROOT"   # workers and gates can run kit scripts: $HIVEMIND/scripts/...
-WORKERS="opencode agy review gate graph git-commit android files upload install comfy video codex codex-review deepseek"
+WORKERS="opencode agy review gate graph git-commit android files upload install comfy video assets codex codex-review deepseek"
 
 field() { sed -n "1,/^---$/p" "$1" | grep -i "^$2:" | head -1 | cut -d: -f2- | sed 's/^ *//; s/ *$//'; }
 body()  { sed '1,/^---$/d' "$1"; }
@@ -93,8 +94,8 @@ oc_model() {  # opencode model shortcut -> model id
   esac
 }
 
-oc_run() {  # $1 model shortcut or id, $2 prompt
-  local m; m="$(oc_model "$1")"
+oc_run() {  # $1 model shortcut or id, $2 prompt, $3 optional total time cap in seconds
+  local m maxs="${3:-${OPENCODE_MAX_SECONDS:-2700}}"; m="$(oc_model "$1")"
   if [ -z "$m" ]; then echo "model unavailable: no model set for '${1:-free}' in config/models.env (list ids: opencode models opencode)"; return 1; fi
   if [[ "$m" == nvidia/* ]] && ! grep -q '"nvidia"' "${XDG_DATA_HOME:-$HOME/.local/share}/opencode/auth.json" 2>/dev/null; then
     echo "model unavailable: no NVIDIA key (optional: build.nvidia.com, then 4 Add API Keys)"; return 1; fi
@@ -108,7 +109,7 @@ oc_run() {  # $1 model shortcut or id, $2 prompt
     if [ "$size" != "$last" ] || [ -n "$(find "${real:-.}" -path '*/.git' -prune -o -type f -newer "$mark" -print -quit 2>/dev/null)" ]; then
       idle=0; last="$size"; touch "$mark"
     else idle=$((idle + 15)); fi
-    if [ "$idle" -ge "${OPENCODE_IDLE_SECONDS:-360}" ] || [ "$t" -ge "${OPENCODE_MAX_SECONDS:-2700}" ]; then
+    if [ "$idle" -ge "${OPENCODE_IDLE_SECONDS:-360}" ] || [ "$t" -ge "$maxs" ]; then
       pkill -P "$pid" 2>/dev/null; kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null
       cat "$log"; rm -f "$log" "$mark"; echo "stalled: no progress for ${idle}s (${t}s in total)"; return 124
     fi
@@ -141,7 +142,7 @@ attempt() {  # one try: $1 worker  $2 model (for gate/review: engine[:model])  -
         agy)
           if [ "$em" = hard ]; then timeout "$MAX_SECONDS" agy -p "$text" --model "$AGY_MODEL_HARD" < /dev/null 2>&1
           else timeout "$MAX_SECONDS" agy -p "$text" < /dev/null 2>&1; fi ;;
-        *) oc_run "$em" "$text" ;;
+        *) oc_run "$em" "$text" "${REVIEW_MAX_SECONDS:-900}" ;;   # reviews and gates only read: capped (default 15 min) so one slow model cannot block the folder
       esac ;;
     deepseek)
       local dm="${m:-$DEEPSEEK_MODEL}"; [ "$m" = "hard" ] && dm="$DEEPSEEK_MODEL_HARD"
@@ -169,6 +170,9 @@ attempt() {  # one try: $1 worker  $2 model (for gate/review: engine[:model])  -
       local msg; msg="$(printf '%s' "$prompt" | head -1 | cut -c1-200)"
       if [ -z "$msg" ] || ! git rev-parse --git-dir >/dev/null 2>&1; then echo "REFUSED: need a commit message and a git repo"; return 1; fi
       git add -A && git commit -m "$msg" && git log --oneline -3 ;;
+    assets)
+      # shared asset library (Games/_Assets): one scripts/assets.py command per line; runs in the project folder
+      printf '%s\n' "$prompt" | timeout "$MAX_SECONDS" python3 "$ROOT/scripts/assets.py" --lines 2>&1 ;;
     files)
       # one "delete <path>" per line, relative to the project; only files inside it, never .git
       local line p f n=0
@@ -229,7 +233,7 @@ LIMIT_PATTERN='rate.?limit|(http|status|code|error)[^a-z0-9]{0,3}429|quota|usage
 is_limit() { tail -n 40 "$1" | grep -qiE "$LIMIT_PATTERN"; }   # $1 = output file of one try
 
 log_usage() {  # one line per model try in logs/usage-ledger.csv (read by scripts/usage.py). $1 id $2 worker $3 spec $4 code $5 start
-  case "$2" in graph|git-commit|android|files|upload|install|comfy|video) return ;; esac   # scripts, no model quota
+  case "$2" in graph|git-commit|android|files|upload|install|comfy|video|assets) return ;; esac   # scripts, no model quota
   local lim=0 spec="$3"; [ "$spec" = opencode ] && spec="opencode:free"
   { [ "$4" -eq 124 ] || [ "$4" -eq 75 ] || { [ "$4" -ne 0 ] && is_limit "$res.try"; }; } && lim=1   # limit or stall
   echo "$(date +%s),$1,$(basename "$real" | tr ',' ' '),$2,$spec,$4,$(( $(date +%s) - $5 )),$lim" >> "$ROOT/logs/usage-ledger.csv"
@@ -253,7 +257,7 @@ run_job() {  # runs in the background, one per job
   case "$worker" in
     gate)   chain="${model:-$GATE_ENGINES}" ;;
     review) chain="${model:-$REVIEW_ENGINES}" ;;
-    graph|git-commit|android|files|upload|install|comfy|video) chain="$worker" ;;
+    graph|git-commit|android|files|upload|install|comfy|video|assets) chain="$worker" ;;
     *)      local first="$worker${model:+:$model}"; [ "$first" = opencode ] && first="opencode:free"   # so GLM is never tried twice
             chain="$first ${fallback:-${!fbvar}}" ;;
   esac

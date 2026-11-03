@@ -206,6 +206,7 @@ Then `5 Check Everything.bat` to confirm each tool answers.
 | See what my own APK or web build exposes | Ask Claude to use REA on it (after `8 Optional - Reverse Engineering (REA).bat`) |
 | Build my own version of another app | Ask Claude for the Replica skills (`replica-recon` first) |
 | See how much usage I have left (Claude, opencode, Antigravity, OpenRouter, Codex) | `windows\shortcuts\20 Usage Overlay.bat` (live window), `windows\shortcuts\19 Usage.bat` (full report) |
+| Reuse downloaded assets (Kenney zips, fonts, sound packs) across games | Drop zips in the `Games` folder, then `windows\shortcuts\21 Asset Library.bat` (or drag zips onto it). Index: `Games\_Assets\INDEX.md` |
 | Use a different account (Claude, opencode, Codex, Antigravity, keys) | Workflow H |
 | Change a usage limit or budget | `config\limits.env` |
 | Know what's planned next | `NEXT.md`, `plans\UNITY-PLAN.md` |
@@ -251,6 +252,7 @@ Then `5 Check Everything.bat` to confirm each tool answers.
 | `18 Stop Autopilot.bat` | Stops the autopilot after its current step |
 | `19 Usage.bat` | Full usage report per provider and model: today, 5-hour window, week, month, what's left, reset times. Lets you type in Claude/Antigravity % by hand if the live reading fails |
 | `20 Usage Overlay.bat` | Small always-on-top window, live (Claude and Antigravity read every 5 min). Simple view: each provider and % left. Header buttons: minimise to one line, detailed view (every window, reset times, a "Not connected" list: hover for how to add), close. Drag to move; right-click: Refresh, Open full report, Start with Windows |
+| `21 Asset Library.bat` | Files downloaded asset packs into the shared library `Games\_Assets` (extracts zips, sorts by type, keeps the zip, reads the licence, updates INDEX.md). Drag zips or folders onto it, or double-click to file every zip in the Games folder |
 
 ### `templates\` (copied into projects, or read by Claude)
 | File | Purpose |
@@ -313,6 +315,7 @@ Then `5 Check Everything.bat` to confirm each tool answers.
 | `export-public.py` | `13 Export Public Version.bat` | Makes the public copy |
 | `usage.py` | `19`/`20` Usage, relay and autopilot after every job | Live Claude and Antigravity quota (clanker-usage), local token logs (Claude Code, opencode, Codex), the relay ledger, OpenRouter; writes `USAGE.md` and `USAGE.json` |
 | `usage-overlay.ps1` | `20 Usage Overlay.bat` | The live usage window (Windows PowerShell) |
+| `assets.py` | `21 Asset Library.bat`, relay `assets` worker | Shared asset library: add, scan, peek, find, list, copy, index |
 
 ### `skills\`
 | Item | Purpose |

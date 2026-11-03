@@ -35,6 +35,11 @@ palette warm or cool) with a recommended answer each, then proceed.
 5. Hand-made by an artist  only for hero assets after the game has proved its KPIs.
 ```
 
+Shared asset library: every downloaded pack is kept once in `<work folder>/Games/_Assets`
+(Hivemind `scripts/assets.py`, relay `assets` worker). Check `INDEX.md` there (or `assets.py find <words>`)
+before step 2 or 3; file new downloads with `add`/`scan` (zips are extracted, licence recorded); copy into a
+game with `copy`, then log it in ASSETS.md. If the project is outside the work folder, ask where to keep assets.
+
 Never ship placeholder grey boxes in a delivered build. Never use assets with unclear
 licences. Never generate a known brand, character or logo.
 

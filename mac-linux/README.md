@@ -69,6 +69,7 @@ Optional: `6 Optional - Android Build Tools` (APKs), `8 Optional - Reverse Engin
 | 17 Autopilot / 18 Stop Autopilot | Unattended work through a TASKS.md, and stopping it |
 | 19 Usage | Full usage report |
 | 20 Usage Live | Live usage view in a terminal window |
+| 21 Asset Library | Drop asset zips or folders on it (or run it to file every zip in the Games folder). Shared library + INDEX.md in Games/_Assets |
 | Sync - Pull / Sync - Push (main folder here) | Keep your computers in step through your GitHub repo |
 
 ## Not on Mac/Linux yet

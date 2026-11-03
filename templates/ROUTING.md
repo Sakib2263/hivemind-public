@@ -72,7 +72,18 @@ Rules:
 | Motion or 3D websites, scroll stories, animated landing pages | Skills: `impeccable` (design, then audit), `scroll-craft` (scroll page), `gsap-*` (animation), `threejs-*` (3D). Builders get them too | Images and clips from the rows above, not paid generators |
 | UI screens, mockups, layout | Claude (design or HTML): where Claude is clearly better | Keep it to the screen asked for |
 | Store and ASO text, short copy | Claude Haiku/Sonnet with the `ua-aso-manager` skill | Short, quality matters |
+| Downloaded packs (Kenney, Quaternius, KayKit, OpenGameArt, fonts) | Shared asset library `Games/_Assets` (`scripts/assets.py`, `assets` worker) | Check `Games/_Assets/INDEX.md` first, never download twice |
 | Anything else | Free local tool first; a paid generator only when free can't reach the quality and the owner OKs the cost | |
+
+**Asset library (reuse across games).** Downloaded or free assets live once in `<work folder>/Games/_Assets`
+(change it with ASSET_LIBRARY in `config/folders.env`; if a project lives elsewhere, ask the owner where to keep them).
+- Before searching or downloading: read `Games/_Assets/INDEX.md` (one row per pack) or `python3 scripts/assets.py find <words>`.
+  Never open whole packs; `files.txt` per pack lists every file.
+- New download (browser downloads land in Downloads or the Games folder): `assets` job `scan <folder>` or `add <zip>`.
+  Zips are extracted and filed by type, the original zip kept in `_zips`, the licence read from the pack, INDEX.md rebuilt.
+  `peek <zip>` lists an archive without extracting. .7z/.rar need 7-Zip in WSL.
+- Into a game: `assets` job `copy <pack>/<glob> <project> [--to assets/audio] [--ogg]`, then log it in the project's ASSETS.md.
+- Only CC0/MIT/OFL ship without a credit; CC-BY needs a credit line; `unknown` is checked before shipping.
 
 ## 3. The loop
 1. Plan (Opus): PLAN.md and TASKS.md, one row per unit with its class and "Done when". Owner approves.
