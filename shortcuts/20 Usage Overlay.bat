@@ -1,0 +1,6 @@
+@echo off
+rem Small always-on-top window: usage left per provider, live. Drag to move; right-click for Refresh, Start with Windows, Close.
+pushd "%~dp0.."
+wsl.exe -- bash -lic "command -v clanker-usage >/dev/null || uv tool install clanker-usage >/dev/null 2>&1; python3 ./scripts/usage.py quiet"
+start "" powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%~dp0..\scripts\usage-overlay.ps1"
+popd

@@ -1,0 +1,215 @@
+{
+ "config": {
+  "title": "Starter Explainer",
+  "voice": "af_heart",
+  "speed": 1.0,
+  "fps": 30,
+  "captions": true,
+  "lufs": -14,
+  "pronounce": {},
+  "music": {
+   "drop_scene": "reveal",
+   "end_scene": "endcard",
+   "bpm": 112,
+   "level": 0.36
+  },
+  "names": {
+   "master": "Starter_Explainer_Full_16x9",
+   "15s": "Starter_Explainer_15s_9x16"
+  },
+  "aspect": "16:9",
+  "aspects": {
+   "15s": "9:16"
+  }
+ },
+ "cuts": {
+  "master": [
+   {
+    "id": "intro",
+    "min": 3.2,
+    "text": "PRESENTS"
+   },
+   {
+    "id": "hook",
+    "type": "title",
+    "tone": "grey",
+    "lines": [
+     "Most campaigns end, and leave you with nothing."
+    ],
+    "kicker": "THE PROBLEM",
+    "title": [
+     "Campaign over.",
+     [
+      [
+       "Data ",
+       "#ffffff"
+      ],
+      [
+       "gone.",
+       "red"
+      ]
+     ]
+    ]
+   },
+   {
+    "id": "reveal",
+    "type": "title",
+    "lines": [
+     "Meet our platform. One place for every campaign."
+    ],
+    "tail": 1.0,
+    "title": [
+     [
+      [
+       "Meet ",
+       "#ffffff"
+      ],
+      [
+       "Your Product",
+       "teal"
+      ]
+     ]
+    ],
+    "sub": "One place for every campaign"
+   },
+   {
+    "id": "benefits",
+    "type": "points",
+    "lines": [
+     "What you get.",
+     "Data you own.",
+     "More sales.",
+     "Lower cost."
+    ],
+    "offset": 1,
+    "heading": "What you get",
+    "items": [
+     [
+      "Data you own",
+      "db",
+      "teal"
+     ],
+     [
+      "More sales",
+      "up",
+      "amber"
+     ],
+     [
+      "Lower cost",
+      "down",
+      "violet"
+     ]
+    ]
+   },
+   {
+    "id": "proof",
+    "type": "stat",
+    "lines": [
+     "Teams finish training eighty-seven percent faster."
+    ],
+    "value": 87,
+    "suffix": "%",
+    "label": "faster training completion"
+   },
+   {
+    "id": "how",
+    "type": "steps",
+    "lines": [
+     "Getting started is simple.",
+     "Share your brief.",
+     "We build it.",
+     "You launch and grow."
+    ],
+    "offset": 1,
+    "heading": "Getting started is simple",
+    "steps": [
+     [
+      "Share your brief",
+      "doc",
+      "Tell us your goal"
+     ],
+     [
+      "We build it",
+      "gear",
+      "Design and setup"
+     ],
+     [
+      "Launch & grow",
+      "rocket",
+      "Engage and repeat"
+     ]
+    ]
+   },
+   {
+    "id": "endcard",
+    "lines": [
+     "Bring any brief.",
+     "We wrap around it."
+    ],
+    "tail": 3.5,
+    "tagline": [
+     "Bring any brief.",
+     "We wrap around it."
+    ],
+    "cta": "Book a demo",
+    "contact": "www.example.com  \u00b7  hello@example.com"
+   }
+  ],
+  "15s": [
+   {
+    "id": "hook",
+    "type": "title",
+    "tone": "grey",
+    "lines": [
+     "Campaign over. Data gone?"
+    ],
+    "title": [
+     "Campaign over.",
+     [
+      [
+       "Data ",
+       "#ffffff"
+      ],
+      [
+       "gone?",
+       "red"
+      ]
+     ]
+    ]
+   },
+   {
+    "id": "reveal",
+    "type": "title",
+    "lines": [
+     "Meet Your Product."
+    ],
+    "title": [
+     [
+      [
+       "Meet ",
+       "#ffffff"
+      ],
+      [
+       "Your Product",
+       "teal"
+      ]
+     ]
+    ]
+   },
+   {
+    "id": "endcard",
+    "lines": [
+     "Bring any brief.",
+     "We wrap around it."
+    ],
+    "tail": 2.0,
+    "tagline": [
+     "Bring any brief.",
+     "We wrap around it."
+    ],
+    "cta": "Book a demo",
+    "contact": "www.example.com"
+   }
+  ]
+ }
+}

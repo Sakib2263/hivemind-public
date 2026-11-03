@@ -1,0 +1,15 @@
+# Project profile: written by shortcuts\8 New Project.bat (or by Claude's intake). Every step reads it.
+folder: "my-game"          # working name; rename any time with 8 New Project.bat
+store_title: ""            # decided before the first release, with ASO (google-play-release skill)
+start: new                 # new | existing | reskin
+reskin_of: ""              # base project folder, for reskins
+engine: web                # web = three.js / Canvas / Vite; unity. Either can build every target.
+targets: [android, web]    # android | ios | web
+android: { distribution: [google-play, test-apk] }   # google-play | third-party-stores | test-apk
+ios: { status: later }
+mobile_sdks: { source: own, publisher: "" }          # own (only our SDKs) | publisher (+ which one)
+web: { where: [playgama] }                           # playgama | poki | crazygames | own-website | other
+tier: M                    # S prototype | M small scalable | L depth game
+unity_version: ""          # unity only, from ProjectSettings/ProjectVersion.txt
+playbook: stacks/web.md
+notes: ""

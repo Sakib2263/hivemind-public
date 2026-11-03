@@ -1,0 +1,254 @@
+# Skill catalog: a map of every skill in this folder, for any AI agent
+# (Claude, Codex, opencode, Antigravity, Gemini CLI, Cursor, others).
+#
+# Format: each skill is a folder with SKILL.md. SKILL.md starts with a YAML header
+# (name, description), the Agent Skills open standard that Claude and Codex both read.
+# Some skills also have references/, scripts/, agents/ or assets/ folders.
+#
+# How an agent should use this file:
+#   1. Read only this index at the start. Don't open every SKILL.md.
+#   2. When a task matches a skill's use_when, read that SKILL.md, then only the
+#      reference files it points to.
+#   3. Skills listed in depends_on are loaded only when that step comes up.
+#
+# visibility:
+#   shareable = safe to give to anyone
+#   company   = your company / Your Studio team only (company process, product examples)
+#   private   = owner only (confidential figures, deal terms, personal voice). Never share.
+# workers: true = installed into ~/.agents/skills for Codex and opencode by scripts/install-rules.sh
+
+schema: 1
+updated: 2026-10-28
+owner: you
+source: shared starter skills; add your own with shortcuts/12 Add My Skills.bat
+
+skills:
+  # --- Coding ---
+  - name: ponytail
+    path: ponytail/SKILL.md
+    category: coding
+    use_when: Any coding task (build, fix, refactor). Smallest complete change, reuse before writing, never cut validation.
+    visibility: shareable
+    workers: true
+    license: MIT, adapted from github.com/dietrichgebert/ponytail
+    depends_on: []
+
+  - name: ponytail-review
+    path: ponytail-review/SKILL.md
+    category: coding
+    use_when: Review a change, audit a repo, or list shortcut debt. Report only, changes nothing.
+    visibility: shareable
+    workers: true
+    license: MIT, adapted from github.com/dietrichgebert/ponytail
+    depends_on: []
+
+  # --- Games ---
+  - name: game-studio-lead
+    path: game-studio-lead/SKILL.md
+    category: games
+    use_when: First stop for any request to make, fix, update or ship a game. Sizes the job, routes to the skills below and to the relay workers.
+    visibility: shareable
+    workers: true
+    depends_on: [game-developer, game-asset-designer, hybrid-casual-game-designer, ua-aso-manager]
+
+  - name: game-developer
+    path: game-developer/SKILL.md
+    category: games
+    use_when: Game code, bug fixes, platform SDKs, builds and store uploads (Playgama, Poki, CrazyGames, itch, Android, PC).
+    visibility: shareable
+    workers: true
+    depends_on: [ponytail]
+
+  - name: game-asset-designer
+    path: game-asset-designer/SKILL.md
+    category: games
+    use_when: Art direction and assets (palettes, sprites, UI, 3D, animation, shaders, VFX, sound, icons, store and ad art).
+    visibility: shareable
+    workers: true
+    depends_on: []
+
+  - name: hybrid-casual-game-designer
+    path: hybrid-casual-game-designer/SKILL.md
+    category: games
+    use_when: Hybrid-casual puzzle concepts, GDDs, levels, economy and playable prototypes to publisher standards.
+    visibility: shareable
+    workers: true
+    depends_on: []
+
+  - name: ua-aso-manager
+    path: ua-aso-manager/SKILL.md
+    category: growth
+    use_when: User acquisition and store listings (Google Ads App, Unity Ads, Play and App Store text, CPI and ROAS).
+    visibility: shareable
+    workers: true
+    depends_on: []
+
+  - name: google-play-release
+    path: google-play-release/SKILL.md
+    category: growth
+    use_when: Android builds and Google Play releases; store listing prompt pack for ChatGPT (icon, feature graphic, screenshots, title, descriptions, promo video).
+    visibility: shareable
+    workers: false
+    depends_on: [game-developer, ua-aso-manager, game-asset-designer, motion-video-producer]
+
+  - name: applovin-max-integration
+    path: applovin-max-integration/SKILL.md
+    category: games
+    use_when: "Add AppLovin MAX ads (AdMob, Mintegral, Unity, Liftoff bidding) and Firebase to a Hivemind web game built as an Android app with Capacitor."
+    visibility: shareable
+    workers: true
+    depends_on: [game-developer]
+
+  - name: more-games-exit
+    path: more-games-exit/SKILL.md
+    category: games
+    use_when: "Add the More games list and the back-button exit prompt (with cross-promo games) to a web game, browser or Android/Capacitor build."
+    visibility: shareable
+    workers: true
+    depends_on: [game-developer]
+
+  # --- Design ---
+  - name: design-taste-frontend
+    path: design-taste-frontend/SKILL.md
+    category: design
+    use_when: "tasteskill v2: art direction for websites, landing and product pages, dashboards and app screens; researched directions, open-licence photos, real-browser inspector. Not for in-game UI."
+    visibility: shareable
+    workers: true
+    license: MIT, Leonxlnx (github.com/Leonxlnx/taste-skill), v2.1.5
+    depends_on: []
+
+  # --- Writing and content ---
+  - name: humanizer
+    path: humanizer/SKILL.md
+    category: writing
+    use_when: Make a draft read as human-written; review or de-slop text. Has scripts/analyze.py (Python, no dependencies).
+    visibility: shareable
+    workers: false
+    depends_on: []
+
+  - name: motion-video-producer
+    path: motion-video-producer/SKILL.md
+    category: content
+    use_when: Plan, script and render 2D motion-graphics videos as MP4 (explainers, promos, pitch and social cuts).
+    visibility: shareable
+    workers: true
+    depends_on: []
+
+  - name: replica-recon
+    path: replica-recon/SKILL.md
+    category: app-clone
+    use_when: "Reverse-engineer an app (public pages, screenshots, store listing, your own account) into a recon map. Step 1 of the Replica pack."
+    visibility: shareable
+    workers: false
+    license: MIT, Jake Schincariol (github.com/Jakeschincariol/replica-skill)
+    depends_on: []
+
+  - name: replica-architect
+    path: replica-architect/SKILL.md
+    category: app-clone
+    use_when: "Plan the stack, database schema and API for an app clone from the recon map."
+    visibility: shareable
+    workers: false
+    license: MIT, Jake Schincariol (github.com/Jakeschincariol/replica-skill)
+    depends_on: [replica-recon]
+
+  - name: replica-design
+    path: replica-design/SKILL.md
+    category: app-clone
+    use_when: "Rebuild a design system as tokens (colour, type, spacing, components) with your own assets; contrast check script."
+    visibility: shareable
+    workers: false
+    license: MIT, Jake Schincariol (github.com/Jakeschincariol/replica-skill)
+    depends_on: [replica-architect]
+
+  - name: replica-build
+    path: replica-build/SKILL.md
+    category: app-clone
+    use_when: "Rebuild the app screen by screen from the recon map."
+    visibility: shareable
+    workers: false
+    license: MIT, Jake Schincariol (github.com/Jakeschincariol/replica-skill)
+    depends_on: [replica-design]
+
+  - name: replica-backend
+    path: replica-backend/SKILL.md
+    category: app-clone
+    use_when: "Auth, database, payments and integrations for the clone (the user creates accounts and keys themselves)."
+    visibility: shareable
+    workers: false
+    license: MIT, Jake Schincariol (github.com/Jakeschincariol/replica-skill)
+    depends_on: [replica-build]
+
+  - name: replica-test
+    path: replica-test/SKILL.md
+    category: app-clone
+    use_when: "Test plan, Playwright end-to-end tests, bug reports for every flow."
+    visibility: shareable
+    workers: false
+    license: MIT, Jake Schincariol (github.com/Jakeschincariol/replica-skill)
+    depends_on: [replica-backend]
+
+  - name: replica-diff
+    path: replica-diff/SKILL.md
+    category: app-clone
+    use_when: "Parity score of the clone against the original, plus what is missing (image diff and parity scripts)."
+    visibility: shareable
+    workers: false
+    license: MIT, Jake Schincariol (github.com/Jakeschincariol/replica-skill)
+    depends_on: [replica-test]
+
+  - name: replica-entrepreneur
+    path: replica-entrepreneur/SKILL.md
+    category: app-clone
+    use_when: "Read what real users dislike in public reviews and turn it into fixes and a positioning angle."
+    visibility: shareable
+    workers: false
+    license: MIT, Jake Schincariol (github.com/Jakeschincariol/replica-skill)
+    depends_on: [replica-diff]
+
+  - name: replica-brand
+    path: replica-brand/SKILL.md
+    category: app-clone
+    use_when: "Name and rebrand the clone so it is your own; sweep script finds leftovers of the original."
+    visibility: shareable
+    workers: false
+    license: MIT, Jake Schincariol (github.com/Jakeschincariol/replica-skill)
+    depends_on: [replica-entrepreneur]
+
+  - name: replica-launch
+    path: replica-launch/SKILL.md
+    category: app-clone
+    use_when: "Landing page, pricing and App Store / Play listing for the clone (listing check script)."
+    visibility: shareable
+    workers: false
+    license: MIT, Jake Schincariol (github.com/Jakeschincariol/replica-skill)
+    depends_on: [replica-brand]
+
+  - name: replica-deploy
+    path: replica-deploy/SKILL.md
+    category: app-clone
+    use_when: "Preflight gate, then ship the clone live on your own domain."
+    visibility: shareable
+    workers: false
+    license: MIT, Jake Schincariol (github.com/Jakeschincariol/replica-skill)
+    depends_on: [replica-launch]
+
+  # --- Security and reverse engineering ---
+  - name: security-hardening
+    path: security-hardening/SKILL.md
+    category: security
+    use_when: "Fix security and encryption findings: secrets, cheatable coins and rewards, fake purchases, save tampering, crypto misuse, Android build and web hardening. After the security gate or before a release."
+    visibility: shareable
+    workers: true
+    depends_on: [ponytail]
+
+  - name: reverse-engineer-anything
+    path: reverse-engineer-anything/SKILL.md
+    category: security
+    use_when: "REA: analyse shipped builds (APK, web, Electron, .NET, native) we own or may analyse: what a build exposes, how a feature works, version diffs. Needs 8 Optional - Reverse Engineering (REA).bat."
+    visibility: shareable
+    workers: false
+    license: MIT, morluto (github.com/morluto/rea)
+    depends_on: []
+
+
