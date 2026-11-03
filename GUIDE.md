@@ -5,7 +5,7 @@ Start here. The README has the deeper detail; this page tells you which file to 
 ## What Hivemind is
 - **Claude (desktop app)** is the lead: it plans, sends work out, and checks results.
 - **Workers** do the building: free models through opencode (GLM, DeepSeek), Antigravity (Gemini), and
-  Codex later if you add a ChatGPT plan.
+  Codex too, as soon as it's logged in (any ChatGPT account).
 - **The relay** is the bridge. Claude drops a job file, the relay runs it with the right worker, and the
   result comes back. Claude never needs you to paste anything into a terminal.
 - Everything runs inside Ubuntu (WSL) on Windows. You only double-click `.bat` files.
@@ -171,7 +171,7 @@ For long jobs you don't want to babysit. Works on any project folder with a TASK
 | Build a test APK or a Play Store release | `shortcuts\10 Build Android App.bat` |
 | Put an APK on my phone | `shortcuts\11 Install APK on Phone.bat` |
 | Keep going when Claude is out of quota | `shortcuts\2 Continue Handoff - opencode.bat` |
-| Open a tool in a project myself | `shortcuts\4 Claude Code - Open.bat`, `5 Antigravity - Open.bat`, `3 Codex - Open.bat` (Codex needs a ChatGPT plan) |
+| Open a tool in a project myself | `shortcuts\4 Claude Code - Open.bat`, `5 Antigravity - Open.bat`, `3 Codex - Open.bat` (Codex needs a ChatGPT login) |
 | Fix PAL after an update | `shortcuts\7 Fix PAL.bat` |
 | Change which model does what | `config\models.env` (models) and `templates\ROUTING.md` (rules) |
 | Change the rules every worker follows | `rules\AGENTS-floor.md`, then `Sync - Pull.bat` (reinstalls them) |
@@ -203,8 +203,8 @@ For long jobs you don't want to babysit. Works on any project folder with a TASK
 |---|---|
 | `1 Start Relay.bat` | Runs the relay. Needed whenever Claude should use the workers |
 | `2 Continue Handoff - opencode.bat` | Free model continues a project when Claude is out of quota |
-| `2 Codex - Continue Handoff.bat` | Same with Codex (only with a ChatGPT plan) |
-| `3 Codex - Open.bat` | Opens Codex in a project (only with a ChatGPT plan) |
+| `2 Codex - Continue Handoff.bat` | Same with Codex (needs a ChatGPT login) |
+| `3 Codex - Open.bat` | Opens Codex in a project (needs a ChatGPT login) |
 | `4 Claude Code - Open.bat` | Opens Claude Code in a project, in Ubuntu |
 | `5 Antigravity - Open.bat` | Opens Antigravity in a project |
 | `6 Check All Tools.bat` | Same check as setup step 5 |
@@ -214,7 +214,7 @@ For long jobs you don't want to babysit. Works on any project folder with a TASK
 | `10 Build Android App.bat` | Test APK (no questions) or signed release (asks only what is not decided yet) |
 | `11 Install APK on Phone.bat` | Installs an APK on a USB-connected phone |
 | `12 Add My Skills.bat` | Brings your own skills in from `skills\inbox\` |
-| `13 Export Public Version.bat` | Owner only: clean public copy without personal or company content |
+| `13 Export Public Version.bat` | Owner only: makes the clean public copy and pushes it to the public repo (also runs after `Sync - Push` when AUTO_PUBLISH is on) |
 | `14 Start Video Studio.bat` | Starts ComfyUI (AI clips and stills). Leave open while making videos |
 | `15 Start Music Studio.bat` | Opens ACE-Step to make songs and background music |
 | `16 Clone Voice.bat` | Drag a folder with voice.wav + lines.txt onto it: one WAV per line in your cloned voice |

@@ -22,6 +22,9 @@ git ls-remote --exit-code --heads origin main >nul 2>&1 && (git pull --rebase or
 git push -u origin main || (echo Upload failed. Check the sign-in window, then try again. & pause & exit /b 1)
 echo.
 echo Uploaded. On your other PC, run "Sync - Pull.bat".
+set "AUTO_PUBLISH="
+if exist "config\public.env" for /f "usebackq eol=# tokens=1,* delims==" %%a in ("config\public.env") do if /i "%%a"=="AUTO_PUBLISH" set "AUTO_PUBLISH=%%~b"
+if /i "%AUTO_PUBLISH%"=="yes" (echo. & echo Publishing the public version... & call "shortcuts\13 Export Public Version.bat" auto)
 git log --oneline -3
 popd
 pause

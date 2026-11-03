@@ -7,9 +7,10 @@ Model names: `config/models.env`. Worker rules: `rules/AGENTS-floor.md`. Checks:
 - Paid: Claude Pro only (the lead). Its quota is the scarcest thing in the system.
 - Free: Antigravity (Gemini), opencode with OpenCode Zen free models (GLM-5.3-Flash, DeepSeek V4.1 Flash),
   OpenRouter free models through PAL (optional).
-- Off: Codex (until a ChatGPT plan is added), DeepSeek pay-per-use API, Grok.
-- When a plan or key is added: update this file and `config/models.env` (put `codex` first in GATE_ENGINES
-  and REVIEW_ENGINES, and give Codex the core and feature rows again).
+- Every provider that can run is used, paid plan or not: Codex (any ChatGPT login, free included), DeepSeek and
+  others sit in the fallback chains. One that isn't logged in, has no key or is out of quota fails in seconds,
+  and the relay skips it for an hour. Never leave a provider out just because it's on a free tier.
+- A plan or key added later: move that provider earlier in the chains in `config/models.env`.
 
 ## 1. Open every task with one line
 `class · lead model · workers · expected result`
@@ -93,7 +94,7 @@ Constraints: <project extras only; usually none>
 | graph | none | Body "update" builds or refreshes graphify-out/; any other text is a question to the graph |
 | git-commit | none | Body = one-line message; commits all changes in that repo |
 | android, files, upload, install, comfy, video | none | Scripts, no model: APK builds, deletes, uploads, phone installs, AI shots, video renders. Body formats: `templates/routing/workers.md` |
-| codex, codex-review, deepseek | | Off (no plan or key); jobs fall back to the free models |
+| codex, codex-review, deepseek | effort (codex) | Codex: any ChatGPT login. DeepSeek: API key. In the fallback chains; skipped automatically when not usable |
 
 **Automatic fallback.** If a worker fails because of a rate limit, quota, login or a missing tool, the relay
 tries the next one in its chain by itself (chains in `config/models.env`, or a `fallback:` header in the job;

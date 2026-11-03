@@ -1,11 +1,11 @@
-# Hivemind: one lead AI, a team of models, on Windows (formerly ai-setup-kit)
+# Hivemind: one lead AI, a team of models
 
 **New here? Start with [SETUP.md](SETUP.md).** Everyday use and every file: GUIDE.md.
 
 **New here? Start with [GUIDE.md](GUIDE.md):** which file does what, and what to use after what.
 
 Claude (desktop app) is the lead agent. Free models do the building: GLM and DeepSeek through opencode,
-and Gemini through Antigravity. Codex (ChatGPT) can join later as a paid worker.
+and Gemini through Antigravity. Codex (ChatGPT) joins as soon as it's logged in, free account included.
 This kit installs everything and gives you double-click shortcuts. Works on any Windows 10/11 PC.
 
 ## What you need
@@ -16,7 +16,7 @@ This kit installs everything and gives you double-click shortcuts. Works on any 
 | Google account | Antigravity worker (free tier works) |
 | Free opencode.ai account + its API key | Main builders: GLM-5.3-Flash and DeepSeek V4.1 Flash free models |
 | OpenRouter key (optional, free) | Extra free models through PAL |
-| ChatGPT Plus or Pro (optional, later) | Codex worker |
+| ChatGPT account, any plan (optional) | Codex worker: used whenever it's logged in and has quota |
 
 ## Where to put this kit
 Put the **Hivemind** folder inside your main work folder, for example `D:\Work\Hivemind`.
@@ -53,8 +53,8 @@ Folder shortcuts: drag a project folder onto the .bat, or double-click and paste
 |---|---|
 | 1 Start Relay.bat | Lets Claude send jobs to the workers. Leave open while working |
 | 2 Continue Handoff - opencode.bat | Claude out of quota? A free model does the next step from the TASKS.md Handoff |
-| 2 Codex - Continue Handoff.bat | Same, with Codex (only with a ChatGPT plan) |
-| 3 Codex - Open.bat | Opens Codex in a project (only with a ChatGPT plan) |
+| 2 Codex - Continue Handoff.bat | Same, with Codex (needs a ChatGPT login) |
+| 3 Codex - Open.bat | Opens Codex in a project (needs a ChatGPT login) |
 | 4 Claude Code - Open.bat | Opens Claude Code (Sonnet) in a project |
 | 5 Antigravity - Open.bat | Opens Antigravity in a project |
 | 6 Check All Tools.bat | Same check as setup step 5 |
@@ -63,7 +63,7 @@ Folder shortcuts: drag a project folder onto the .bat, or double-click and paste
 | 10 Build Android App.bat | Drag a project on it: asks for app name, bundle id and icon if missing, confirms, then builds a test APK or a signed Play release (AAB + APK) into `builds\android\` |
 | 11 Install APK on Phone.bat | Drag an APK on it: installs it on a phone plugged in by USB (USB debugging on) |
 | 12 Add My Skills.bat | Brings in your own skills: drop skill folders or .skill / .zip files into `skills\inbox\`; they are checked, listed (private by default) and installed |
-| 13 Export Public Version.bat | Owner only: makes a clean public copy (`..\hivemind-public`) without keys, personal skills, plans or company details |
+| 13 Export Public Version.bat | Owner only: makes the clean public copy (`..\hivemind-public`) and pushes it to the public repo in `config\public.env`. Runs after `Sync - Push` too when AUTO_PUBLISH is on |
 | 19 Usage.bat | Full usage report: live Claude and Antigravity %, tokens and jobs per provider and model (today, 5-hour window, week, month), what's left, reset times |
 | 20 Usage Overlay.bat | Small always-on-top window with usage left per provider, live. Right-click: Refresh, Start with Windows, Close |
 | 9 Pack Skills.bat | Zips each skill into `skills-packages\` for uploading to claude.ai or sharing (shareable / company / private folders) |
@@ -109,7 +109,7 @@ Who does what, and how to save tokens: `templates\ROUTING.md`.
 Claude writes a job file to `relay\inbox\<id>.job`; the relay (`shortcuts\1 Start Relay.bat`) runs it with the
 worker the job names and puts the results in `relay\outbox\`. It is not Codex-only: it runs every worker below.
 ```
-worker: opencode         (opencode, agy, review, gate, graph, git-commit, android; codex and deepseek when paid)
+worker: opencode         (opencode, agy, review, gate, graph, git-commit, android; codex with a ChatGPT login, deepseek with an API key)
 dir: /mnt/d/Work/My Game (WSL form of a folder inside the work folder)
 model: free              (opencode: free = GLM, free2 = DeepSeek. agy: hard = Gemini Pro)
 gate: build              (gate only: build, security, release)
@@ -131,7 +131,7 @@ Step 3 logs opencode in to OpenCode Zen with your free account key. The two free
 Both keep no data and don't train on it. Free periods end: if `5 Check Everything.bat` shows one failing, run
 `opencode models opencode` in Ubuntu, pick a new id ending in `-free`, and paste it into `config\models.env`.
 Avoid Big Pickle, Flint, MiMo and Nemotron free models for real work: they keep or train on data.
-Later, with paid plans: a ChatGPT plan turns Codex on (see ROUTING.md), GitHub Copilot or a Google AI Studio key
+Codex is used whenever it's logged in (any ChatGPT plan). Later: GitHub Copilot or a Google AI Studio key
 fill the `copilot` / `gemini` lines. Don't log ChatGPT or Claude into opencode itself.
 
 ## Rules worth keeping
