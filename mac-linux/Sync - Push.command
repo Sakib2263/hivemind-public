@@ -3,6 +3,7 @@
 cd "$(dirname "$0")" && ARG1="$1" && . ./_env.sh
 git status --short
 read -r -p "Describe the change (Enter = 'update Hivemind'): " MSG; MSG="${MSG:-update Hivemind}"
+sed -i "s/^_Last updated: .*_$/_Last updated: $(date +%Y-%m-%d)_/" README.md
 git add -A && git add --chmod=+x -- 'mac-linux/*.command' 'mac-linux/shortcuts/*.command' 2>/dev/null
 git commit -m "$MSG" || echo "Nothing new to save."
 git ls-remote --exit-code --heads origin main >/dev/null 2>&1 && { git pull --rebase origin main || { echo "Pull failed. Ask Claude to help."; pause_end; exit 1; }; }

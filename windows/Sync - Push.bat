@@ -16,6 +16,7 @@ git status --short
 set "MSG="
 set /p "MSG=Describe the change (Enter = 'update Hivemind'): "
 if "%MSG%"=="" set "MSG=update Hivemind"
+powershell -NoProfile -Command "$f='README.md'; $t=[IO.File]::ReadAllText($f); $n=$t -replace '(?m)^_Last updated: .*_', ('_Last updated: '+(Get-Date -Format yyyy-MM-dd)+'_'); if ($n -ne $t) { [IO.File]::WriteAllText($f, $n) }"
 git add -A
 git add --chmod=+x -- "mac-linux/*.command" "mac-linux/shortcuts/*.command" >nul 2>&1
 git commit -m "%MSG%" || echo Nothing new to save.
