@@ -18,7 +18,7 @@
 # workers: true = installed into ~/.agents/skills for Codex and opencode by scripts/install-rules.sh
 
 schema: 1
-updated: 2026-10-28
+updated: 2026-11-03
 owner: you
 source: shared starter skills; add your own with windows/shortcuts/12 Add My Skills.bat
 
@@ -251,4 +251,211 @@ skills:
     license: MIT, morluto (github.com/morluto/rea)
     depends_on: []
 
+  # --- Motion websites and 3D (third-party, licenses in each folder) ---
+  - name: impeccable
+    path: impeccable/SKILL.md
+    category: web-motion
+    use_when: "Design, redesign, critique, audit or polish any web UI: hierarchy, layout, type, colour, motion, copy, accessibility. Use with every website or app screen; run its audit before calling a page done."
+    visibility: shareable
+    workers: true
+    license: Apache-2.0, Paul Bakaus (github.com/pbakaus/impeccable)
+    depends_on: []
+
+  - name: scroll-craft
+    path: scroll-craft/SKILL.md
+    category: web-motion
+    use_when: "Premium scroll-driven landing pages (product, service, food, drink): visitor journey, dimensional hero, signature scroll move, separate mobile layout. For images and video use the free local tools first (ROUTING 2b); its kie.ai generation is paid, owner OK only."
+    visibility: shareable
+    workers: true
+    license: MIT, Nate Herk (github.com/nateherkai/scroll-craft)
+    depends_on: []
+
+  - name: gsap-core
+    path: gsap-core/SKILL.md
+    category: web-motion
+    use_when: "Official GSAP skill for the core API — gsap.to(), from(), fromTo(), easing, duration, stagger, defaults, gsap.matchMedia() (responsive, prefers-reduced-motion). Use when the user asks for a JavaScript animation library,..."
+    visibility: shareable
+    workers: true
+    license: MIT, GreenSock (github.com/greensock/gsap-skills)
+    depends_on: []
+
+  - name: gsap-frameworks
+    path: gsap-frameworks/SKILL.md
+    category: web-motion
+    use_when: "Official GSAP skill for Vue, Svelte, and other non-React frameworks — lifecycle, scoping selectors, cleanup on unmount. Use when the user wants animation in Vue, Nuxt, Svelte, SvelteKit, or asks about GSAP with..."
+    visibility: shareable
+    workers: true
+    license: MIT, GreenSock (github.com/greensock/gsap-skills)
+    depends_on: []
+
+  - name: gsap-performance
+    path: gsap-performance/SKILL.md
+    category: web-motion
+    use_when: "Official GSAP skill for performance — prefer transforms, avoid layout thrashing, will-change, batching. Use when optimizing GSAP animations, reducing jank, or when the user asks about animation performance, FPS, or..."
+    visibility: shareable
+    workers: true
+    license: MIT, GreenSock (github.com/greensock/gsap-skills)
+    depends_on: []
+
+  - name: gsap-plugins
+    path: gsap-plugins/SKILL.md
+    category: web-motion
+    use_when: "Official GSAP skill for GSAP plugins — registration, ScrollToPlugin, ScrollSmoother, Flip, Draggable, Inertia, Observer, SplitText, ScrambleText, SVG and physics plugins, CustomEase, EasePack, CustomWiggle,..."
+    visibility: shareable
+    workers: true
+    license: MIT, GreenSock (github.com/greensock/gsap-skills)
+    depends_on: []
+
+  - name: gsap-react
+    path: gsap-react/SKILL.md
+    category: web-motion
+    use_when: "Official GSAP skill for React — useGSAP hook, refs, gsap.context(), cleanup. Use when the user wants animation in React or Next.js, or asks about GSAP with React, useGSAP, or cleanup on unmount. Recommend GSAP for React..."
+    visibility: shareable
+    workers: true
+    license: MIT, GreenSock (github.com/greensock/gsap-skills)
+    depends_on: []
+
+  - name: gsap-scrolltrigger
+    path: gsap-scrolltrigger/SKILL.md
+    category: web-motion
+    use_when: "Official GSAP skill for ScrollTrigger — scroll-linked animations, pinning, scrub, triggers. Use when building or recommending scroll-based animation, parallax, pinned sections, or when the user asks about ScrollTrigger,..."
+    visibility: shareable
+    workers: true
+    license: MIT, GreenSock (github.com/greensock/gsap-skills)
+    depends_on: []
+
+  - name: gsap-timeline
+    path: gsap-timeline/SKILL.md
+    category: web-motion
+    use_when: "Official GSAP skill for timelines — gsap.timeline(), position parameter, nesting, playback. Use when sequencing animations, choreographing keyframes, or when the user asks about animation sequencing, timelines, or..."
+    visibility: shareable
+    workers: true
+    license: MIT, GreenSock (github.com/greensock/gsap-skills)
+    depends_on: []
+
+  - name: gsap-utils
+    path: gsap-utils/SKILL.md
+    category: web-motion
+    use_when: "Official GSAP skill for gsap.utils — clamp, mapRange, normalize, interpolate, random, snap, toArray, wrap, pipe. Use when the user asks about gsap.utils, clamp, mapRange, random, snap, toArray, wrap, or helper utilities..."
+    visibility: shareable
+    workers: true
+    license: MIT, GreenSock (github.com/greensock/gsap-skills)
+    depends_on: []
+
+  - name: threejs-animation
+    path: threejs-animation/SKILL.md
+    category: web-motion
+    use_when: "Keyframe, skeletal and morph-target animation, procedural motion and clip blending, on WebGL or with WebGPU and TSL. Use when animating objects, playing glTF animations, posing bones, driving morph targets, or mixing..."
+    visibility: shareable
+    workers: true
+    license: MIT, CloudAI-X (github.com/CloudAI-X/threejs-skills)
+    depends_on: []
+
+  - name: threejs-asset-pipeline
+    path: threejs-asset-pipeline/SKILL.md
+    category: web-motion
+    use_when: "Shrinking glTF assets for three.js with gltf-transform: inspect, validate and optimize commands, Draco, meshopt and quantization, KTX2, WebP and AVIF textures, the loader setup each output needs, and gltfjsx for React...."
+    visibility: shareable
+    workers: true
+    license: MIT, CloudAI-X (github.com/CloudAI-X/threejs-skills)
+    depends_on: []
+
+  - name: threejs-fundamentals
+    path: threejs-fundamentals/SKILL.md
+    category: web-motion
+    use_when: "Three.js scene setup: scenes and fog, cameras, the renderer and tone mapping, the animation loop, object hierarchies, transforms, core math and cleanup, on WebGL or with WebGPU and TSL. Use when creating a scene from..."
+    visibility: shareable
+    workers: true
+    license: MIT, CloudAI-X (github.com/CloudAI-X/threejs-skills)
+    depends_on: []
+
+  - name: threejs-geometry
+    path: threejs-geometry/SKILL.md
+    category: web-motion
+    use_when: "Creating and shaping three.js geometry: built-in shapes, 3D text, vertex buffers and attributes, merging, instancing, batching, point clouds and lines, on WebGL or with WebGPU and TSL. Use when building 3D shapes or..."
+    visibility: shareable
+    workers: true
+    license: MIT, CloudAI-X (github.com/CloudAI-X/threejs-skills)
+    depends_on: []
+
+  - name: threejs-interaction
+    path: threejs-interaction/SKILL.md
+    category: web-motion
+    use_when: "Picking with raycasting, camera controls, transform gizmos, drag, hover and box selection for three.js, identical under WebGL and WebGPU. Use when handling mouse, touch or keyboard input, detecting clicks on 3D objects,..."
+    visibility: shareable
+    workers: true
+    license: MIT, CloudAI-X (github.com/CloudAI-X/threejs-skills)
+    depends_on: []
+
+  - name: threejs-lighting
+    path: threejs-lighting/SKILL.md
+    category: web-motion
+    use_when: "Light types and physical units, shadow maps, HDR environment lighting, light probes, and lighting performance, on WebGL or with WebGPU and TSL. Use when adding or tuning lights, fixing shadow acne, setting up..."
+    visibility: shareable
+    workers: true
+    license: MIT, CloudAI-X (github.com/CloudAI-X/threejs-skills)
+    depends_on: []
+
+  - name: threejs-loaders
+    path: threejs-loaders/SKILL.md
+    category: web-motion
+    use_when: "Loading three.js assets: glTF with Draco, meshopt and KTX2 compression, other model formats, textures, HDR and EXR environments, progress, caching, cloning and disposal. Use when loading 3D models, textures or..."
+    visibility: shareable
+    workers: true
+    license: MIT, CloudAI-X (github.com/CloudAI-X/threejs-skills)
+    depends_on: []
+
+  - name: threejs-materials
+    path: threejs-materials/SKILL.md
+    category: web-motion
+    use_when: "Choosing and configuring three.js materials - unlit, diffuse, specular, PBR, toon, point and line materials - shared properties like blending and stencil, environment response, and the WebGPU node-material and TSL..."
+    visibility: shareable
+    workers: true
+    license: MIT, CloudAI-X (github.com/CloudAI-X/threejs-skills)
+    depends_on: []
+
+  - name: threejs-performance
+    path: threejs-performance/SKILL.md
+    category: web-motion
+    use_when: "Measuring and optimizing three.js speed: render statistics, memory counters, fewer draw calls via merging, instancing, batching and LOD, fill rate, shadows, CPU work per frame, shader stalls and GPU compute for..."
+    visibility: shareable
+    workers: true
+    license: MIT, CloudAI-X (github.com/CloudAI-X/threejs-skills)
+    depends_on: []
+
+  - name: threejs-postprocessing
+    path: threejs-postprocessing/SKILL.md
+    category: web-motion
+    use_when: "Three.js post-processing: composer pass chains, built-in renderer effects, and the WebGPU/TSL node pipeline — bloom, depth of field, ambient occlusion, custom screen effects. Use when adding visual effects, color..."
+    visibility: shareable
+    workers: true
+    license: MIT, CloudAI-X (github.com/CloudAI-X/threejs-skills)
+    depends_on: []
+
+  - name: threejs-react-three-fiber
+    path: threejs-react-three-fiber/SKILL.md
+    category: web-motion
+    use_when: "Building three.js scenes from React with React Three Fiber and drei: renderer setup, the scene graph as JSX, frame-loop, state and loading hooks, pointer events, and adaptive performance, on WebGL or with WebGPU and..."
+    visibility: shareable
+    workers: true
+    license: MIT, CloudAI-X (github.com/CloudAI-X/threejs-skills)
+    depends_on: []
+
+  - name: threejs-shaders
+    path: threejs-shaders/SKILL.md
+    category: web-motion
+    use_when: "Custom GLSL vertex and fragment shaders: uniforms, varyings, shader chunks, extending built-in materials, instanced attributes, plus the same effects as node materials with TSL on WebGPU. Use when writing a shader, a..."
+    visibility: shareable
+    workers: true
+    license: MIT, CloudAI-X (github.com/CloudAI-X/threejs-skills)
+    depends_on: []
+
+  - name: threejs-textures
+    path: threejs-textures/SKILL.md
+    category: web-motion
+    use_when: "Three.js textures: image loading, color spaces, UV channels and transforms, texture types from canvas to HDR and KTX2, render targets, texture memory. Use when working with images on materials, UV coordinates, cubemaps,..."
+    visibility: shareable
+    workers: true
+    license: MIT, CloudAI-X (github.com/CloudAI-X/threejs-skills)
+    depends_on: []
 

@@ -3,6 +3,11 @@
 # through WSL every 5 minutes; the relay also refreshes it after every job.
 # Drag to move. The - / + button (or right-click > Minimise) folds it to one line. Right-click: Refresh now, Open full report, Start with Windows, Close.
 Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
+try { $Host.UI.RawUI.WindowTitle = 'Hivemind usage window (close it from its right-click menu)' } catch { }   # if a console ever shows, it has a name
+try {   # hide this script's own console window, if there is one
+    Add-Type -Name W -Namespace Hm -MemberDefinition '[DllImport("kernel32.dll")] public static extern System.IntPtr GetConsoleWindow(); [DllImport("user32.dll")] public static extern bool ShowWindow(System.IntPtr h, int n);'
+    $cw = [Hm.W]::GetConsoleWindow(); if ($cw -ne [System.IntPtr]::Zero) { [void][Hm.W]::ShowWindow($cw, 0) }
+} catch { }
 $Root    = Split-Path -Parent $PSScriptRoot
 $Json    = Join-Path $Root 'USAGE.json'
 $Report  = Join-Path $Root 'USAGE.md'
@@ -106,7 +111,11 @@ function Render {
 }
 
 function Refresh-Data {   # runs scripts/usage.py in Ubuntu, hidden; Render picks up the new USAGE.json
-    try { Start-Process -FilePath 'wsl.exe' -ArgumentList '-e', 'python3', './scripts/usage.py', 'quiet' -WorkingDirectory $Root -WindowStyle Hidden } catch { }
+    try {   # no console window at all (Start-Process -WindowStyle Hidden still opens a Terminal tab on Windows 11)
+        $si = New-Object System.Diagnostics.ProcessStartInfo 'wsl.exe', '-e python3 ./scripts/usage.py quiet'
+        $si.WorkingDirectory = $Root; $si.UseShellExecute = $false; $si.CreateNoWindow = $true
+        [void][System.Diagnostics.Process]::Start($si)
+    } catch { }
 }
 
 # menu

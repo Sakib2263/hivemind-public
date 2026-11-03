@@ -61,6 +61,7 @@ Rules:
 | Motion graphics, captions, explainers | `motion-video-producer` skill (`video` worker) | Free |
 | Music, jingles | ACE-Step (`15 Start Music Studio`) | Free |
 | Voiceover | Chatterbox clone (`16 Clone Voice`) | Free, owner's own voice |
+| Motion or 3D websites, scroll stories, animated landing pages | Skills: `impeccable` (design, then audit), `scroll-craft` (scroll page), `gsap-*` (animation), `threejs-*` (3D). Builders get them too | Images and clips from the rows above, not paid generators |
 | UI screens, mockups, layout | Claude (design or HTML): where Claude is clearly better | Keep it to the screen asked for |
 | Store and ASO text, short copy | Claude Haiku/Sonnet with the `ua-aso-manager` skill | Short, quality matters |
 | Anything else | Free local tool first; a paid generator only when free can't reach the quality and the owner OKs the cost | |
