@@ -41,4 +41,4 @@ yes | sdkmanager --licenses >/dev/null 2>&1
 sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0" >/dev/null && ok "platform-tools, android-36, build-tools 36" || fail "SDK packages"
 command -v adb >/dev/null && ok "$(adb version | head -1)" || fail "adb"
 
-echo; [ -z "$FAILED" ] && echo "ALL OK. Build with shortcuts\\10 Build Android App.bat" || echo "Something failed: send logs\\android-setup.log to Claude."
+echo; [ -z "$FAILED" ] && echo "ALL OK. Build with windows\shortcuts\\10 Build Android App.bat" || echo "Something failed: send logs\\android-setup.log to Claude."

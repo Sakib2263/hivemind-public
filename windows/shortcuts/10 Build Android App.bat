@@ -10,7 +10,7 @@ echo 2 = Release for Google Play (signed AAB + APK)
 set /p "T=Choose 1 or 2: "
 set "MODE=debug"
 if "%T%"=="2" set "MODE=release"
-pushd "%~dp0.."
+pushd "%~dp0..\.."
 wsl.exe -- bash -lic "bash ./scripts/android-build.sh \"$(wslpath '%DIR%')\" %MODE%"
 popd
 if exist "%DIR%\builds\android\" start "" "%DIR%\builds\android"

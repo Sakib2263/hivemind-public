@@ -1,7 +1,7 @@
 @echo off
 title Optional - Android build tools (Java, Android SDK, adb)
 rem Needed only to build Android apps. Downloads about 1-2 GB. Safe to run again.
-pushd "%~dp0"
+pushd "%~dp0.."
 wsl.exe -- bash -lic "bash ./scripts/android-setup.sh"
 echo.
 echo Getting adb for Windows (installs APKs on a phone over USB)...

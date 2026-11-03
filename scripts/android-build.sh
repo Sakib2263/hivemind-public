@@ -45,7 +45,7 @@ setup_signing() {
   [ -f "$ks" ] || { touch "$SD/ALLOW_NEW_KEY"; echo "A new keystore will be made on this first release build."; }
 }
 if [ "$MODE" = release ] && [ ! -f "$SIGNF" ]; then
-  [ "$TTY" = 1 ] && setup_signing || missing "signing setup. Run shortcuts\\10 Build Android App.bat once and choose release (it asks for the keystore details)"
+  [ "$TTY" = 1 ] && setup_signing || missing "signing setup. Run windows\shortcuts\\10 Build Android App.bat once and choose release (it asks for the keystore details)"
 fi
 
 # ---- 2. App facts ----------------------------------------------------------------------------
@@ -77,7 +77,7 @@ NEED=""
 [ -z "$APP_NAME" ] && NEED="$NEED APP_NAME"
 [ -z "$APP_ID" ] && NEED="$NEED APP_ID"
 [ "$MODE" = release ] && [ -z "$ICON" ] && NEED="$NEED ICON(required for release)"
-[ -n "$NEED" ] && missing "$NEED. Ask the owner (decide the name with ASO), put them in $ENVF, or run shortcuts\\10 Build Android App.bat"
+[ -n "$NEED" ] && missing "$NEED. Ask the owner (decide the name with ASO), put them in $ENVF, or run windows\shortcuts\\10 Build Android App.bat"
 [[ "$APP_ID" =~ $ID_RE ]] || die "bundle id '$APP_ID' is not valid: lowercase words joined by dots, like com.yourstudio.mygame"
 [ "${#APP_NAME}" -le 30 ] || die "app name is longer than 30 characters"
 if [ -n "$ICON" ]; then
@@ -259,7 +259,7 @@ if [ "$MODE" = debug ]; then
   rm -f "$OUTD"/*.apk "$OUTD"/*.aab
   cp app/build/outputs/apk/debug/app-debug.apk "$OUTD/$BASE-debug.apk"
   log_build debug "$BASE-debug.apk"
-  echo "BUILT: builds/android/$BASE-debug.apk  (test build: install with shortcuts\\11 Install APK on Phone.bat)"
+  echo "BUILT: builds/android/$BASE-debug.apk  (test build: install with windows\shortcuts\\11 Install APK on Phone.bat)"
 else
   KS="$KEYSTORE"; [[ "$KS" == /* ]] || KS="$SD/$KS"
   # Never make a new key by accident: an update signed with a different key is refused by Google Play.

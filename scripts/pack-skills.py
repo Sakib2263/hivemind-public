@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Zips each skill in skills/ into skills-packages/<visibility>/<name>.zip
 (the zip format claude.ai accepts for upload; any other agent can unzip it).
-Started by shortcuts/9 Pack Skills.bat. No dependencies."""
+Started by windows/shortcuts/9 Pack Skills.bat. No dependencies."""
 import os, re, shutil, zipfile
 
 kit = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))

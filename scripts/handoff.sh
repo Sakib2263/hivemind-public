@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Claude is out of quota: a free model continues the project from its TASKS.md Handoff, one pass.
-# Started by "shortcuts\2 Continue Handoff - opencode.bat". $1 = project folder (WSL path).
+# Started by "windows\shortcuts\2 Continue Handoff - opencode.bat". $1 = project folder (WSL path).
 KIT="$(cd "$(dirname "$0")/.." && pwd)"
 export PATH="$HOME/.local/bin:$PATH"; export NVM_DIR="$HOME/.nvm"; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 . "$KIT/config/models.env"

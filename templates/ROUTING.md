@@ -15,6 +15,10 @@ Model names: `config/models.env`. Worker rules: `rules/AGENTS-floor.md`. Checks:
 **Mac/Linux:** shortcut names in these rules are the Windows `.bat` ones. On Mac/Linux the same number and name is
 in `mac-linux/` or `mac-linux/shortcuts/` as a `.command` file, and a relay `dir:` is the normal path (`/Users/me/Work/My Game`).
 
+**Relay first.** Before any work the workers could do: `relay/heartbeat` must be under a minute old. If not, stop,
+ask the owner to open `windows\Start Hivemind.bat` (Mac/Linux: `mac-linux/Start Hivemind.command`), and wait.
+Never quietly do worker jobs in Claude because the relay is off. Check again before each new batch of jobs.
+
 ## 1. Open every task with one line
 `class · lead model · workers · expected result`
 Example: `feature · Sonnet · opencode + review + gate build · level select screen in src/ui/levels.js`
@@ -125,7 +129,7 @@ tries the next one in its chain by itself (chains in `config/models.env`, or a `
 - One heavy job (build, render, headless browser test) on the machine at a time.
 
 ## 7. When Claude runs out
-Drag the project onto `shortcuts\2 Continue Handoff - opencode.bat`: a free model does the next step from
+Drag the project onto `windows\shortcuts\2 Continue Handoff - opencode.bat`: a free model does the next step from
 the TASKS.md Handoff. Repeat per step, or wait for the Claude reset. Antigravity can also be opened
 directly for reading and planning help.
 
@@ -146,7 +150,7 @@ monetization rules) and use the `motion-video-producer` skill. Renders and AI sh
 ## 9a. Game projects: intake first
 Before planning any game work, read the project's `project.yaml`. Missing? Ask the intake questions from
 `stacks/README.md` in one message (start, engine, targets, Android store, own or publisher SDKs, web portal, tier), suggest an answer for each,
-and write the file (template: `templates/project.yaml`), or tell the owner to run `shortcuts\8 New Project.bat`.
+and write the file (template: `templates/project.yaml`), or tell the owner to run `windows\shortcuts\8 New Project.bat`.
 Then follow the playbook it names: `stacks/web.md` or `stacks/unity.md`. A project's engine is decided once;
 switching engines is a plan-class decision for Opus and the owner.
 

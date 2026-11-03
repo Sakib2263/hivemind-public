@@ -14,8 +14,8 @@ Start here. The README has the deeper detail; this page tells you which file to 
 - Everything runs inside Ubuntu (WSL) on Windows. You only double-click `.bat` files.
 
 Two kinds of `.bat` files:
-- **Root folder, numbered 0 to 6:** one-time setup steps, run in order.
-- **`shortcuts\` folder, numbered 1 to 13:** everyday tools. Drag a project folder onto the ones that ask for one.
+- **`windows\` folder, numbered 0 to 9:** one-time setup steps, run in order. `Start Hivemind.bat` there: open it every day.
+- **`windows\shortcuts\` folder, numbered 1 to 13:** everyday tools. Drag a project folder onto the ones that ask for one.
 
 ## Where projects live, and which folders to give Claude
 - **Work folder:** the folder that holds Hivemind (for example `D:\Work`). Projects go next to Hivemind
@@ -43,7 +43,7 @@ the relay is running (it asks you to start it if not).
 **Every chat (30 seconds):**
 1. Open the Project, start a **new chat** (one chat per task).
 2. "+" > "Add folder": your work folder (see the table above). Do this in every new chat.
-3. Coding or building today? Double-click `shortcuts\1 Start Relay.bat` (or let Claude remind you).
+3. Coding or building today? Double-click `windows\shortcuts\1 Start Relay.bat` (or let Claude remind you).
 4. Type the task. Examples:
 
 | Situation | Type |
@@ -75,7 +75,7 @@ a Google account (Antigravity), a free account at opencode.ai (for its API key).
 ```
 D:\AI-Work\                 <- work folder: add THIS folder in Claude
   hivemind\                  <- this kit (setup files, shortcuts, rules, relay)
-  My Game\                   <- a project (made by shortcuts\8 New Project.bat)
+  My Game\                   <- a project (made by windows\shortcuts\8 New Project.bat)
   Client Website\            <- another project
 ```
 
@@ -98,43 +98,44 @@ Done. From now on you only use workflow B and "Starting a chat".
 Second PC: same steps; `Sync - Pull.bat` keeps both PCs on the same Hivemind version (your own private GitHub repo).
 
 ### B. Every working day
-1. `Sync - Pull.bat`: get the latest Hivemind from GitHub (also refreshes worker rules and skills).
-2. `shortcuts\1 Start Relay.bat`: leave the window open (minimised) while you work.
+0. `windows\Start Hivemind.bat` (starts the relay and the usage window; right-click the usage window to start it with Windows).
+1. `windows\Sync - Pull.bat`: get the latest Hivemind from GitHub (also refreshes worker rules and skills).
+2. Leave the relay window that Start Hivemind opened running (minimised) while you work.
 3. In Claude: new chat per task, add the work folder, type the task (see "Starting a chat" above).
 4. Changed anything in Hivemind itself? `Sync - Push.bat` at the end of the day.
 
 ### C. A game project, from start to release
 | When | Use | Result |
 |---|---|---|
-| Start a game (new, existing, or a reskin of a base game) | `shortcuts\8 New Project.bat` | Folder, `project.yaml` (engine, targets, SDKs), plan and task files, git. Only a folder name is asked; the title comes later |
+| Start a game (new, existing, or a reskin of a base game) | `windows\shortcuts\8 New Project.bat` | Folder, `project.yaml` (engine, targets, SDKs), plan and task files, git. Only a folder name is asked; the title comes later |
 | Plan and build | Claude chat (it follows `stacks\web.md` or `stacks\unity.md`) | Work done by the workers, reviewed and checked |
-| Try it on a phone | `shortcuts\10 Build Android App.bat`, choose 1 (test APK), then `shortcuts\11 Install APK on Phone.bat` | Test APK in `<game>\builds\android\`, installed by USB. No questions asked |
+| Try it on a phone | `windows\shortcuts\10 Build Android App.bat`, choose 1 (test APK), then `windows\shortcuts\11 Install APK on Phone.bat` | Test APK in `<game>\builds\android\`, installed by USB. No questions asked |
 | Before the first release | Ask Claude for the ASO and store listing (google-play-release skill) | Store title, bundle id, icon decided; ChatGPT prompt pack for the store art and text |
 | Before release build and publish | Automatic: Claude runs the store assets check | Anything missing (icon, feature graphic, screenshots, texts, privacy policy) is asked for, or Claude writes the ChatGPT prompt for it |
-| Release build | `shortcuts\10 Build Android App.bat`, choose 2 | Signed AAB for Google Play (+ APK). First time on a PC it asks for the signing details |
+| Release build | `windows\shortcuts\10 Build Android App.bat`, choose 2 | Signed AAB for Google Play (+ APK). First time on a PC it asks for the signing details |
 | Upload | You, in Play Console | Claude never uploads or publishes |
 
 ### D. Claude ran out of quota mid-task
-`shortcuts\2 Continue Handoff - opencode.bat` and drag the project on it: a free model does the next step from TASKS.md. Repeat, or wait for the Claude reset.
+`windows\shortcuts\2 Continue Handoff - opencode.bat` and drag the project on it: a free model does the next step from TASKS.md. Repeat, or wait for the Claude reset.
 
 ### E. Skills: add yours, share them, publish Hivemind
 | Want to | Use |
 |---|---|
-| Add your own skills | Put folders or `.skill` / `.zip` files in `skills\inbox\`, then `shortcuts\12 Add My Skills.bat` |
-| Send a skill to someone, or upload it to claude.ai | `shortcuts\9 Pack Skills.bat` (zips in `skills-packages\shareable / company / private`). Never send private |
-| Make a public copy of Hivemind (owner only) | `shortcuts\13 Export Public Version.bat` (makes `..\hivemind-public`, lists what still needs a generic rewrite) |
+| Add your own skills | Put folders or `.skill` / `.zip` files in `skills\inbox\`, then `windows\shortcuts\12 Add My Skills.bat` |
+| Send a skill to someone, or upload it to claude.ai | `windows\shortcuts\9 Pack Skills.bat` (zips in `skills-packages\shareable / company / private`). Never send private |
+| Make a public copy of Hivemind (owner only) | `windows\shortcuts\13 Export Public Version.bat` (makes `..\hivemind-public`, lists what still needs a generic rewrite) |
 
 ### F. Videos and content (desktop with an NVIDIA GPU)
 Once:
 1. `9 Optional - Video Studio.bat`: a setup window opens. Pick the install folder (a drive with space, outside hivemind;
    the choice is saved in `config\studio.env`) and tick the parts: video, images, music, voice. A progress window does
    the rest; run it again any time to add parts or resume a broken download.
-2. In a Windows terminal: `wsl --shutdown`, then `shortcuts\1 Start Relay.bat` again.
-3. `shortcuts\9 Pack Skills.bat`, then upload `motion-video-producer` from `skills-packages\` to your claude.ai skills
+2. In a Windows terminal: `wsl --shutdown`, then `windows\shortcuts\1 Start Relay.bat` again.
+3. `windows\shortcuts\9 Pack Skills.bat`, then upload `motion-video-producer` from `skills-packages\` to your claude.ai skills
    (keeps the account copy of the video skill up to date for chats without the folder).
 
 Each video day:
-1. `shortcuts\1 Start Relay.bat` and `shortcuts\14 Start Video Studio.bat` (leave both open).
+1. `windows\shortcuts\1 Start Relay.bat` and `windows\shortcuts\14 Start Video Studio.bat` (leave both open).
 2. New chat in the Project, add the work folder, then type one of:
 
 | Situation | Type |
@@ -150,12 +151,12 @@ Playbook with tools, licences and monetization rules: `stacks\video.md`. Content
 
 ### G. Long unattended runs (autopilot)
 For long jobs you don't want to babysit. Works on any project folder with a TASKS.md.
-1. Start `shortcuts\1 Start Relay.bat` (and `14 Start Video Studio.bat` for video work).
-2. Drag the project folder onto `shortcuts\17 Autopilot.bat`, enter the hours (default 8).
+1. Start `windows\shortcuts\1 Start Relay.bat` (and `14 Start Video Studio.bat` for video work).
+2. Drag the project folder onto `windows\shortcuts\17 Autopilot.bat`, enter the hours (default 8).
 3. It runs one board row per fresh session, with no permission prompts: anything outside a safe list
    (deleting, pushing, uploading, spending) is refused automatically. When Claude runs out of quota, the
    free models take over. It stops when the board is done, a row needs you (question in the TASKS.md
-   Handoff), the hours run out, or you run `shortcuts\18 Stop Autopilot.bat`.
+   Handoff), the hours run out, or you run `windows\shortcuts\18 Stop Autopilot.bat`.
 4. Log: `logs\autopilot\`. Check the Handoff and the git log when you're back.
 
 ---
@@ -163,26 +164,26 @@ For long jobs you don't want to babysit. Works on any project folder with a TASK
 ## 2. "I want to..." quick finder
 | I want to... | Open |
 |---|---|
-| Let Claude work for hours without me | Drag the project onto `shortcuts\17 Autopilot.bat` (section G) |
+| Let Claude work for hours without me | Drag the project onto `windows\shortcuts\17 Autopilot.bat` (section G) |
 | Make videos, Shorts or a content channel | `9 Optional - Video Studio.bat` once, then ask Claude: "Make a video about X" (playbook `stacks\video.md`) |
 | Set up a new PC | Workflow A |
 | Get the other PC's changes | `Sync - Pull.bat` |
 | Save my Hivemind changes to GitHub | `Sync - Push.bat` |
-| Let Claude send work to the models | `shortcuts\1 Start Relay.bat` (keep it open) |
-| Check that everything works | `5 Check Everything.bat` or `shortcuts\6 Check All Tools.bat` (same thing) |
-| Start or reshape a game project, rename its folder | `shortcuts\8 New Project.bat` |
-| Build a test APK or a Play Store release | `shortcuts\10 Build Android App.bat` |
-| Put an APK on my phone | `shortcuts\11 Install APK on Phone.bat` |
-| Keep going when Claude is out of quota | `shortcuts\2 Continue Handoff - opencode.bat` |
-| Open a tool in a project myself | `shortcuts\4 Claude Code - Open.bat`, `5 Antigravity - Open.bat`, `3 Codex - Open.bat` (Codex needs a ChatGPT login) |
-| Fix PAL after an update | `shortcuts\7 Fix PAL.bat` |
+| Let Claude send work to the models | `windows\shortcuts\1 Start Relay.bat` (keep it open) |
+| Check that everything works | `5 Check Everything.bat` or `windows\shortcuts\6 Check All Tools.bat` (same thing) |
+| Start or reshape a game project, rename its folder | `windows\shortcuts\8 New Project.bat` |
+| Build a test APK or a Play Store release | `windows\shortcuts\10 Build Android App.bat` |
+| Put an APK on my phone | `windows\shortcuts\11 Install APK on Phone.bat` |
+| Keep going when Claude is out of quota | `windows\shortcuts\2 Continue Handoff - opencode.bat` |
+| Open a tool in a project myself | `windows\shortcuts\4 Claude Code - Open.bat`, `5 Antigravity - Open.bat`, `3 Codex - Open.bat` (Codex needs a ChatGPT login) |
+| Fix PAL after an update | `windows\shortcuts\7 Fix PAL.bat` |
 | Change which model does what | `config\models.env` (models) and `templates\ROUTING.md` (rules) |
 | Change the rules every worker follows | `rules\AGENTS-floor.md`, then `Sync - Pull.bat` (reinstalls them) |
 | Change a check (build, security, release, review) | `gates\*.md` |
 | Fix security or encryption problems | Ask Claude: it runs the `security` check, then fixes with the `security-hardening` skill |
 | See what my own APK or web build exposes | Ask Claude to use REA on it (after `8 Optional - Reverse Engineering (REA).bat`) |
 | Build my own version of another app | Ask Claude for the Replica skills (`replica-recon` first) |
-| See how much usage I have left (Claude, opencode, Antigravity, OpenRouter, Flow) | `shortcuts\20 Usage Overlay.bat` (live window), `shortcuts\19 Usage.bat` (full report) |
+| See how much usage I have left (Claude, opencode, Antigravity, OpenRouter, Flow) | `windows\shortcuts\20 Usage Overlay.bat` (live window), `windows\shortcuts\19 Usage.bat` (full report) |
 | Change a usage limit or budget | `config\limits.env` |
 | Know what's planned next | `NEXT.md`, `plans\UNITY-PLAN.md` |
 
@@ -194,14 +195,16 @@ For long jobs you don't want to babysit. Works on any project folder with a TASK
 | File | Purpose |
 |---|---|
 | `GUIDE.md` | This page |
-| `README.md` | Full reference: requirements, relay job format, free models, troubleshooting |
-| `NEXT.md` | The to-do list for building Hivemind further, in order |
-| `0` to `8 *.bat` | Setup steps (workflow A); 0, 6 and 8 are optional |
-| `my-claude-instructions.txt` | Made by `7 Connect Claude.bat`: your filled-in Project instructions (not on GitHub) |
-| `Sync - Pull.bat` / `Sync - Push.bat` | Keep two PCs in step through your private GitHub repo |
+| `README.md` | Overview: how it works, what you need, usage limits, relay job format, free models, troubleshooting |
+| `LICENSE`, `CONTRIBUTING.md` | Noncommercial license; how to contribute (fork + pull request) |
+| `NEXT.md` | The to-do list for building Hivemind further, in order (owner only) |
+| `windows\` | Windows: setup steps `0` to `9` (0, 6, 8, 9 optional), `Start Hivemind.bat`, Sync, `README.md`, `shortcuts\` |
+| `mac-linux\` | The same for Mac and Linux, as `.command` files |
+| `my-claude-instructions.txt` | Made by `7 Connect Claude`: your filled-in Project instructions (not on GitHub) |
+| `windows\Sync - Pull.bat` / `Sync - Push.bat` | Keep two PCs in step through your private GitHub repo |
 | `.gitignore`, `.gitattributes` | What git leaves out (keys, logs, jobs, tools, zips) and line-ending rules |
 
-### `shortcuts\` (everyday tools)
+### `windows\shortcuts\` (everyday tools)
 | File | Purpose |
 |---|---|
 | `1 Start Relay.bat` | Runs the relay. Needed whenever Claude should use the workers |

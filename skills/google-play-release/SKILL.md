@@ -50,7 +50,7 @@ An update signed with a different key is refused by Google Play, so never let a 
    - Anything already on Google Play from this studio, or a new computer: ask the owner to restore the whole
      `secrets\android\` folder from the backup (USB or private cloud), following `README-KEYSTORE.md` there. Stop until it is back.
    - The studio's very first release ever: confirm with the owner in one message, then the owner runs
-     `shortcuts\10 Build Android App.bat` and chooses release (or Claude creates `secrets\android\ALLOW_NEW_KEY`
+     `windows\shortcuts\10 Build Android App.bat` and chooses release (or Claude creates `secrets\android\ALLOW_NEW_KEY`
      after that explicit yes). The build makes the key once and deletes the marker.
    - Without the key or that marker the build stops with `MISSING: keystore ... not found`. Never work around it.
 3. Fingerprint: every release build prints `Upload key SHA-256: ...` and compares it with
@@ -69,8 +69,8 @@ An update signed with a different key is refused by Google Play, so never let a 
    test ids in debug builds; live MAX/AdMob ids go into index.android.html (and the native
    config) only for the release build, after the owner gives them. Never edit the Playgama or
    own-portal index files for a Play change.
-1. Debug APK first: relay `worker: android`, body `debug` (or `shortcuts\10 Build Android App.bat`).
-   The owner installs it with `shortcuts\11 Install APK on Phone.bat` and plays it once on a real phone.
+1. Debug APK first: relay `worker: android`, body `debug` (or `windows\shortcuts\10 Build Android App.bat`).
+   The owner installs it with `windows\shortcuts\11 Install APK on Phone.bat` and plays it once on a real phone.
 2. Run the gates: `build`, `security` (if coins, IAP, ads rewards or accounts), then `release`.
 3. Release: relay `worker: android`, body `release`, only after step 2 passes.
    Output: `builds/android/<name>-<version>-<code>-release.aab` (upload) and `.apk` (same build, phone test).

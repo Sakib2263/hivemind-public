@@ -1,7 +1,7 @@
 # Hivemind on Mac and Linux
 
-Same kit, same rules, same numbers as Windows. The Windows `.bat` files stay in the main folder and
-`shortcuts\`; your launchers are here, as `.command` files. Everything they run is shared with Windows.
+Same kit, same rules, same numbers as Windows (whose `.bat` files are in `../windows/`). Your launchers are
+here, as `.command` files, and they work on both macOS and Linux. Everything they run is shared.
 
 - **Mac:** double-click a `.command` file. The first time, macOS may block it: right-click it > Open > Open.
 - **Linux:** run it from a terminal (`./"1 Install Basics.command"`), or allow "run executable files" in
@@ -21,7 +21,7 @@ Same kit, same rules, same numbers as Windows. The Windows `.bat` files stay in 
 1. Get the kit into a work folder, for example `~/Work`:
    ```
    mkdir -p ~/Work && cd ~/Work
-   git clone https://github.com/YOUR_GITHUB_USER/hivemind.git
+   git clone https://github.com/Sakib2263/hivemind-public.git
    chmod +x hivemind/mac-linux/*.command hivemind/mac-linux/shortcuts/*.command
    ```
    (No git yet on a Mac? Run `xcode-select --install` first.)
@@ -46,8 +46,9 @@ Optional: `6 Optional - Android Build Tools` (APKs), `8 Optional - Reverse Engin
 ## Every day
 1. Mac: new chat in your Project, one per task; "+" > "Add folder" > your work folder.
    Linux: `cd ~/Work && claude` (one session per task).
-2. Run `shortcuts/1 Start Relay` and leave it open.
-3. Type the task, for example `My Game: continue from the Handoff.`
+   Before that, every time: open **`Start Hivemind`** (here in `mac-linux`). It starts the relay (and on a Mac the
+   live usage window). Leave it open. Without it, Claude does everything itself and burns its own quota.
+2. Type the task, for example `My Game: continue from the Handoff.`
 
 ## Shortcuts (`mac-linux/shortcuts/`)
 | Launcher | Does |

@@ -12,7 +12,7 @@
    the newest build; every build is a line in `builds/android/VERSIONS.md`.
    Before saying a build is ready: the owner installs it and looks at the icon, More Games (if offered) and back on Home.
 5. Release signing: one keystore signs every app, set in `secrets/android/signing.env` (never committed).
-   If it's missing (MISSING: signing setup), the owner runs `shortcuts\10 Build Android App.bat` once and
+   If it's missing (MISSING: signing setup), the owner runs `windows\shortcuts\10 Build Android App.bat` once and
    chooses release; it asks for studio, bundle start, keystore, alias and password. After that the relay
    builds releases alone. Never print or repeat the keystore password in chat or files outside secrets/.
 6. Not set up yet ("Android build tools are not installed")? Tell the owner to run `6 Optional - Android Build Tools.bat`.

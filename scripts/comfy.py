@@ -52,7 +52,7 @@ def server():
             return u.rstrip("/")
         except (urllib.error.URLError, OSError):
             continue
-    die("ComfyUI is not running. Double-click shortcuts\\14 Start Video Studio.bat and try again. (tried %s)"
+    die("ComfyUI is not running. Double-click windows\shortcuts\\14 Start Video Studio.bat and try again. (tried %s)"
         % ", ".join(cands), 3)
 
 

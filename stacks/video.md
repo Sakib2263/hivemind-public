@@ -14,12 +14,12 @@ images, ACE-Step music, Chatterbox voice all fit. Run one GPU job at a time.
 | Script | Claude writes, owner edits (Gate 1) | chat | `references/script-template.md` |
 | Motion graphics, text, charts, diagrams, UI, maps | motion-video-producer engine (canvas, headless Chromium) | WSL, CPU | relay `video` job |
 | English voice, fast | Kokoro (built into the skill) | WSL, CPU | `voice: "af_heart"` etc. in cuts.json |
-| Own voice, cloned | Chatterbox (MIT) | Windows GPU | `voice: "files"`, then `shortcuts\16 Clone Voice.bat` on `build\voice` |
+| Own voice, cloned | Chatterbox (MIT) | Windows GPU | `voice: "files"`, then `windows\shortcuts\16 Clone Voice.bat` on `build\voice` |
 | Recorded human voice | owner records | - | `voice: "files"`, put `001.wav ...` in `build\voice\vo\` |
 | AI video clips (b-roll, hero shots) | Wan 2.2 TI2V 5B (Apache 2.0) in ComfyUI | Windows GPU | `shots.json` + relay `comfy` job |
 | Stills (backgrounds, start frames, thumbnails) | FLUX.1 schnell fp8 (Apache 2.0) in ComfyUI | Windows GPU | `kind: "image"` in shots.json |
 | Animate a still | Wan 2.2 5B image-to-video | Windows GPU | `kind: "i2v", image: "@<image shot id>"` |
-| Music | ACE-Step 1.5 (MIT) or the skill's generated track | Windows GPU / WSL | ACE-Step: `shortcuts\15 Start Music Studio.bat`, save into `assets\`, set `music.file` |
+| Music | ACE-Step 1.5 (MIT) or the skill's generated track | Windows GPU / WSL | ACE-Step: `windows\shortcuts\15 Start Music Studio.bat`, save into `assets\`, set `music.file` |
 | Sound effects | the skill's 30 built-in SFX | WSL | scene cues |
 | Captions | burned in by the skill | WSL | on by default |
 | Final edit, if needed | DaVinci Resolve or CapCut (owner) | Windows | - |
@@ -30,9 +30,9 @@ Never Higgsfield-style subscriptions with credits.
 ## Setup (once)
 1. `9 Optional - Video Studio.bat`: setup window, pick the install folder (outside hivemind, saved in
    `config\studio.env`) and the parts (video, images, music, voice).
-2. After it: `wsl --shutdown` in a Windows terminal, then `shortcuts\1 Start Relay.bat` again (the relay
+2. After it: `wsl --shutdown` in a Windows terminal, then `windows\shortcuts\1 Start Relay.bat` again (the relay
    reaches ComfyUI on localhost through mirrored networking).
-3. Each video day: `shortcuts\14 Start Video Studio.bat` and leave it open.
+3. Each video day: `windows\shortcuts\14 Start Video Studio.bat` and leave it open.
 4. Test: `python3 <hivemind>/scripts/comfy.py ping` from WSL shows the 3060.
 
 ## A content project

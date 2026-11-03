@@ -2,7 +2,7 @@
 """Adds your own skills to Hivemind. Put them in skills/inbox/ first: a skill folder (with SKILL.md),
 or a .skill / .zip file (the zip claude.ai and Claude Code use). Each one is checked, moved to
 skills/<name>/ and listed in skills/index.yaml, then worker skills are installed.
-Started by shortcuts/12 Add My Skills.bat. Your skills are 'private' by default: never exported."""
+Started by windows/shortcuts/12 Add My Skills.bat. Your skills are 'private' by default: never exported."""
 import os, re, shutil, sys, tempfile, zipfile, subprocess
 
 kit = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))

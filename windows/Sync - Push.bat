@@ -3,7 +3,7 @@ title Sync - send your Hivemind changes to GitHub
 rem Saves your changes and uploads them to your private repo. The first time, it also links this folder.
 rem Needs Git for Windows (git-scm.com). The first upload opens a GitHub sign-in window in your browser.
 set "REPO=https://github.com/YOUR_GITHUB_USER/hivemind.git"
-pushd "%~dp0"
+pushd "%~dp0.."
 where git >nul 2>&1 || (echo Git is not installed. Get it from https://git-scm.com/download/win & pause & exit /b 1)
 if not exist ".git" (
   echo First upload from this PC: linking this folder to GitHub...
@@ -25,7 +25,7 @@ echo.
 echo Uploaded. On your other PC, run "Sync - Pull.bat".
 set "AUTO_PUBLISH="
 if exist "config\public.env" for /f "usebackq eol=# tokens=1,* delims==" %%a in ("config\public.env") do if /i "%%a"=="AUTO_PUBLISH" set "AUTO_PUBLISH=%%~b"
-if /i "%AUTO_PUBLISH%"=="yes" (echo. & echo Publishing the public version... & call "shortcuts\13 Export Public Version.bat" auto)
+if /i "%AUTO_PUBLISH%"=="yes" (echo. & echo Publishing the public version... & call "windows\shortcuts\13 Export Public Version.bat" auto)
 git log --oneline -3
 popd
 pause

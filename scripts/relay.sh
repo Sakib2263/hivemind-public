@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Relay: Claude (desktop app) drops job files in relay/inbox, this script runs them with the
 # worker named in the job and writes results to relay/outbox.
-# Start once in an Ubuntu window and leave it open (Ctrl+C to stop): shortcuts\1 Start Relay.bat
+# Start once in an Ubuntu window and leave it open (Ctrl+C to stop): windows\shortcuts\1 Start Relay.bat
 #
 # Job file: relay/inbox/<id>.job
 #   worker: opencode | agy | review | gate | graph | git-commit | android | files | upload | install | comfy | video   (codex, codex-review, deepseek: when those plans/keys exist)
@@ -200,7 +200,7 @@ attempt() {  # one try: $1 worker  $2 model (for gate/review: engine[:model])  -
       if [ "$win" = 1 ]; then timeout 300 "$adb" install -r "$(wslpath -w "$f")"; else timeout 300 "$adb" install -r "$f"; fi ;;
     comfy)
       # body line 1: shots file inside the project (default shots.json), optional words: force, only=id,id
-      # AI clips and stills on the Windows GPU through ComfyUI (shortcuts\14 Start Video Studio.bat must be open)
+      # AI clips and stills on the Windows GPU through ComfyUI (windows\shortcuts\14 Start Video Studio.bat must be open)
       local p f extra=() w2
       p="$(printf '%s' "$prompt" | head -1 | tr -d '\r')"; set -- $p; f="${1:-shots.json}"; shift 2>/dev/null
       for w2 in "$@"; do case "$w2" in force) extra+=(--force) ;; only=*) extra+=(--only "${w2#only=}") ;; esac; done

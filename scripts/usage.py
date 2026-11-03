@@ -370,7 +370,7 @@ def build():
         row(f"Google Flow {acc}", "credits left", note, f"{v:.0f} (~{int(v // clip)} Fast clips)" if v is not None else "?",
             status(v / monthly * 100 if v is not None else None, None, "?"), 100 - v / monthly * 100 if v is not None else None)
 
-    out.append(f"# Usage overview\nUpdated {NOW.strftime('%d %b %Y %H:%M')}. Refresh: `shortcuts\\19 Usage.bat`, "
+    out.append(f"# Usage overview\nUpdated {NOW.strftime('%d %b %Y %H:%M')}. Refresh: `windows\shortcuts\\19 Usage.bat`, "
                "or it updates after every relay job.\n")
     out.append("## At a glance\n| Provider | Window | Used | Left | Resets in | Status |\n|---|---|---|---|---|---|")
     out += [f"| {g['provider']} | {g['window']} | {g['used']} | {g['left']} | {g['until'] or '-'} | {g['status']} |" for g in glance]

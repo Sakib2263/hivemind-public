@@ -117,11 +117,11 @@ After each job, open `references/upgrade-log.md` and follow it:
 
 - **Cloned or recorded voice:** set `"voice": "files"` in `cuts.json` config. `vo` writes every unique line to
   `build/voice/lines.txt` and stops (exit 3) until `build/voice/vo/001.wav ...` exist. Make them with
-  Chatterbox (`shortcuts\16 Clone Voice.bat` on `build/voice`, with `voice.wav` there or in `assets/`)
+  Chatterbox (`windows\shortcuts\16 Clone Voice.bat` on `build/voice`, with `voice.wav` there or in `assets/`)
   or a real recording, one file per line. Then run `vo` again. Only clone a voice with written consent.
 - **Real music file:** `"music": {"file": "assets/track.mp3", "level": 0.36, "end_scene": "endcard"}`.
   Looped or trimmed to length, faded in, faded out at `end_scene`, ducked under the voice. Use ACE-Step
-  output (`shortcuts\15 Start Music Studio.bat`) or licensed music only.
+  output (`windows\shortcuts\15 Start Music Studio.bat`) or licensed music only.
 - **AI clips and stills:** `shots.json` in the project, run by the relay `comfy` worker (Wan 2.2 5B video,
   FLUX schnell images, on the Windows GPU). Results land in `build/ai/`. Format and prompts:
   `<hivemind>/stacks/video.md`. Showing clips inside scenes is planned (VIDEO-PLAN V2).

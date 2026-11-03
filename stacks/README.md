@@ -3,7 +3,7 @@
 (Videos and content series are not games: they follow `video.md`.)
 
 Every game project starts with an intake that writes `project.yaml` at the project root
-(`shortcuts\8 New Project.bat` asks the questions; Claude asks them in chat when the file is missing).
+(`windows\shortcuts\8 New Project.bat` asks the questions; Claude asks them in chat when the file is missing).
 After that, every step (SDKs, building, QA, release) follows the playbook for that stack:
 `web.md` or `unity.md`. No separate agent per stack: one router (game-studio-lead) + these playbooks.
 

@@ -97,5 +97,5 @@ if ($Voice) {
   if ($LASTEXITCODE -ne 0) { throw "Chatterbox install failed (see above)" }
 }
 Say "DONE. Installed in $Studio. Log: install.log there."
-Write-Host "Next: wsl --shutdown, start the relay, then shortcuts\14 Start Video Studio.bat."
+Write-Host "Next: wsl --shutdown, start the relay, then windows\shortcuts\14 Start Video Studio.bat."
 Stop-Transcript | Out-Null

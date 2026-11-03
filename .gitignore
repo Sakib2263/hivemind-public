@@ -21,4 +21,5 @@ USAGE.json
 relay/STATUS.md
 relay/.status.*
 logs/overlay-pos.txt
+logs/overlay-state.txt
 __pycache__/

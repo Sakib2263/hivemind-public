@@ -23,7 +23,7 @@ Hivemind `stacks/README.md` in one message, with a suggested answer for each: st
 reskin; only a folder name, the game title is decided before release with ASO), engine (web or Unity; either builds every target), targets (Android,
 iOS later, web), Android store (Google Play, third-party stores, test APK), mobile SDKs (own or publisher),
 web portal, tier. Write the file (Hivemind `templates/project.yaml`) or point the user to
-`shortcuts\8 New Project.bat`.
+`windows\shortcuts\8 New Project.bat`.
 
 Choose the engine by target and SDKs, not habit: web games, prototypes and light mobile games with own
 SDKs are web; mobile games with publisher SDKs (Voodoo, Supersonic, Homa), 3D or physics-heavy games and

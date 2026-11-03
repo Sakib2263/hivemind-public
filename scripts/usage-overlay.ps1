@@ -1,15 +1,20 @@
 # Usage overlay: a small always-on-top window showing what's left per provider and model.
-# Started by shortcuts\20 Usage Overlay.bat. Shows USAGE.json (made by scripts/usage.py) and refreshes it
+# Started by windows\shortcuts\20 Usage Overlay.bat. Shows USAGE.json (made by scripts/usage.py) and refreshes it
 # through WSL every 5 minutes; the relay also refreshes it after every job.
-# Drag to move. Right-click: Refresh now, Open full report, Start with Windows, Close.
+# Drag to move. The - / + button (or right-click > Minimise) folds it to one line. Right-click: Refresh now, Open full report, Start with Windows, Close.
 Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
 $Root    = Split-Path -Parent $PSScriptRoot
 $Json    = Join-Path $Root 'USAGE.json'
 $Report  = Join-Path $Root 'USAGE.md'
 $PosFile = Join-Path $Root 'logs\overlay-pos.txt'
-$Bat     = Join-Path $Root 'shortcuts\20 Usage Overlay.bat'
+$StateFile = Join-Path $Root 'logs\overlay-state.txt'   # "compact" = minimised to one line
+$script:Compact = (Test-Path $StateFile) -and ((Get-Content $StateFile -Raw).Trim() -eq 'compact')
+$Bat     = Join-Path $Root 'windows\Start Hivemind.bat'   # what Start with Windows launches: relay + this window
 $Startup = Join-Path ([Environment]::GetFolderPath('Startup')) 'Hivemind Usage Overlay.lnk'
 
+if (Test-Path $Startup) {   # an entry from before a folder move: point it at the current Start Hivemind
+    try { $sc = (New-Object -ComObject WScript.Shell).CreateShortcut($Startup); if ($sc.TargetPath -ne $Bat) { $sc.TargetPath = $Bat; $sc.WorkingDirectory = (Split-Path $Bat); $sc.Save() } } catch { }
+}
 $mutex = New-Object System.Threading.Mutex($false, 'HivemindUsageOverlay')   # one copy only
 if (-not $mutex.WaitOne(0)) { exit }
 
@@ -49,6 +54,12 @@ $border.Background = New-Object System.Windows.Media.SolidColorBrush ([System.Wi
 $stack = New-Object System.Windows.Controls.StackPanel
 $border.Child = $stack; $w.Content = $border
 
+function Toggle {   # minimise to one line, or expand again; remembered for next time
+    $script:Compact = -not $script:Compact
+    try { $(if ($script:Compact) { 'compact' } else { 'full' }) | Set-Content $StateFile } catch { }
+    Render
+}
+
 function Render {
     $stack.Children.Clear()
     $d = $null
@@ -58,7 +69,20 @@ function Render {
     if (-not $d) { [void]$head.Children.Add((Text 'loading...' '#8B949E' 11)); [void]$stack.Children.Add($head); return }
     $age = [int]([DateTimeOffset]::Now - (Dto $d.updated)).TotalMinutes
     $note = if ($age -gt 15) { "updated $age min ago" } else { 'updated ' + (Dto $d.updated).ToLocalTime().ToString('HH:mm') }
+    $btn = Text ($(if ($script:Compact) { '+' } else { [string][char]0x2212 })) '#C9D1D9' 14 0 $true
+    $btn.Cursor = 'Hand'; $btn.ToolTip = 'Minimise / expand'; $btn.Padding = '6,0,2,0'
+    $btn.Add_PreviewMouseLeftButtonDown({ param($s, $e) $e.Handled = $true; Toggle })
+    if ($script:Compact) {   # one line: Claude session left + how many rows need attention
+        $cl = $d.rows | Where-Object { $_.provider -like 'Claude Pro*' -and $_.window -like 'session*' } | Select-Object -First 1
+        $bad = @($d.rows | Where-Object { $_.status -like 'LIMIT*' -or $_.status -eq 'OUT' -or $_.status -eq 'LOW' })
+        $sum = 'Claude ' + $(if ($cl) { $cl.left } else { '?' }) + $(if ($bad.Count) { "  |  $($bad.Count) need attention" } else { '  |  all ok' })
+        $col = if ($bad | Where-Object { $_.status -like 'LIMIT*' -or $_.status -eq 'OUT' }) { '#E5534B' } elseif ($bad.Count) { '#D29922' } else { '#3FB950' }
+        [void]$head.Children.Add((Text $sum $col 12 0 $true))
+        [void]$head.Children.Add($btn); $head.Margin = '0'
+        [void]$stack.Children.Add($head); return
+    }
     [void]$head.Children.Add((Text $note ($(if ($age -gt 15) { '#D29922' } else { '#8B949E' })) 11))
+    [void]$head.Children.Add($btn)
     [void]$stack.Children.Add($head)
     foreach ($r in $d.rows) {
         $line = New-Object System.Windows.Controls.StackPanel; $line.Orientation = 'Horizontal'; $line.Margin = '0,1,0,1'
@@ -89,8 +113,9 @@ function Refresh-Data {   # runs scripts/usage.py in Ubuntu, hidden; Render pick
 $menu = New-Object System.Windows.Controls.ContextMenu
 function Item($label, $action) { $i = New-Object System.Windows.Controls.MenuItem; $i.Header = $label; $i.Add_Click($action); [void]$menu.Items.Add($i); $i }
 [void](Item 'Refresh now' { Refresh-Data })
+[void](Item 'Minimise / expand' { Toggle })
 [void](Item 'Open full report' { if (Test-Path $Report) { Start-Process notepad.exe -ArgumentList "`"$Report`"" } })
-$auto = Item 'Start with Windows' {
+$auto = Item 'Start Hivemind with Windows (relay + this window)' {
     if (Test-Path $Startup) { Remove-Item $Startup -Force }
     else { $s = (New-Object -ComObject WScript.Shell).CreateShortcut($Startup); $s.TargetPath = $Bat; $s.WorkingDirectory = (Split-Path $Bat); $s.WindowStyle = 7; $s.Save() }
     $auto.IsChecked = Test-Path $Startup

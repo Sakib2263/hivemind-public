@@ -7,7 +7,7 @@ hm, osname = sys.argv[1], sys.argv[2]
 t = open(os.path.join(hm, "templates", "claude-project-instructions.md"), encoding="utf-8").read()
 body = re.split(r"(?m)^---\s*$", t)[1].strip()
 body = body.replace("<hivemind>", hm).replace("<work folder>", os.path.dirname(hm)).replace("\\", "/")
-body = body.replace("shortcuts/1 Start Relay.bat", "mac-linux/shortcuts/1 Start Relay.command")
+body = body.replace("windows/shortcuts/1 Start Relay.bat", "mac-linux/shortcuts/1 Start Relay.command").replace("windows/Start Hivemind.bat", "mac-linux/Start Hivemind.command")
 system = "macOS" if osname == "Darwin" else "Linux"
 body += f"\nThis computer: {system}. Shortcuts are in mac-linux/ and mac-linux/shortcuts/ (.command, same numbers as the\nWindows .bat names in the rules). Relay job dir: the normal path, e.g. {os.path.dirname(hm)}/My Game."
 open(os.path.join(hm, "my-claude-instructions.txt"), "w", encoding="utf-8").write(body + "\n")

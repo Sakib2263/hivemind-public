@@ -7,7 +7,7 @@ set "DIR=%DIR:"=%"
 if not exist "%DIR%\TASKS.md" (echo No TASKS.md in: %DIR% & pause & exit /b 1)
 set /p "HRS=How many hours at most? [8]: "
 if "%HRS%"=="" set HRS=8
-pushd "%~dp0.."
+pushd "%~dp0..\.."
 wsl.exe -- bash -lic "bash ./scripts/autopilot.sh \"$(wslpath '%DIR%')\" %HRS%"
 popd
 pause

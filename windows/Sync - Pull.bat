@@ -3,7 +3,7 @@ title Sync - get the latest Hivemind from GitHub
 rem Downloads the latest kit from your private GitHub repo. Your keys (secrets\keys.env) are never touched.
 rem Needs Git for Windows (git-scm.com). The first time, a GitHub sign-in window opens in your browser.
 set "REPO=https://github.com/YOUR_GITHUB_USER/hivemind.git"
-pushd "%~dp0"
+pushd "%~dp0.."
 where git >nul 2>&1 || (echo Git is not installed. Get it from https://git-scm.com/download/win & pause & exit /b 1)
 if not exist ".git" (
   echo First sync on this PC: linking this folder to GitHub...

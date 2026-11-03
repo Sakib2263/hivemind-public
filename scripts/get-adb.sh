@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Windows adb (platform-tools) into hivemind\tools, once per computer. Used by the relay install worker
-# and by shortcuts\11 Install APK on Phone.bat. Safe to run again.
+# and by windows\shortcuts\11 Install APK on Phone.bat. Safe to run again.
 KIT="$(cd "$(dirname "$0")/.." && pwd)"; T="$KIT/tools"
 if ! grep -qi microsoft /proc/version 2>/dev/null; then   # macOS/Linux: the native adb (SDK or PATH first)
   command -v adb >/dev/null || [ -x "$HOME/android-sdk/platform-tools/adb" ] || [ -x "$T/platform-tools/adb" ] && exit 0

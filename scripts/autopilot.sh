@@ -3,7 +3,7 @@
 # the owner stops it, or the time budget runs out. Each step is a fresh headless session (no long chat,
 # no permission prompts: tools outside the allow-list are simply refused).
 #   bash autopilot.sh <project dir (WSL path)> [hours, default 8]
-# Stop: shortcuts\18 Stop Autopilot.bat (creates relay/AUTOPILOT.stop), or close the window.
+# Stop: windows\shortcuts\18 Stop Autopilot.bat (creates relay/AUTOPILOT.stop), or close the window.
 # Claude out of quota: that step goes to the free opencode models; if they fail too, wait and retry.
 KIT="$(cd "$(dirname "$0")/.." && pwd)"
 export PATH="$HOME/.local/bin:$PATH"; export NVM_DIR="$HOME/.nvm"; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
@@ -40,7 +40,7 @@ ledger() {  # $1 spec $2 exit $3 start: one line in logs/usage-ledger.csv, then 
   echo "$(date +%s),autopilot-$n,$(basename "$DIR" | tr ',' ' '),autopilot,$1,$2,$(( $(date +%s) - $3 )),$lim" >> "$KIT/logs/usage-ledger.csv"
   python3 "$KIT/scripts/usage.py" quiet >/dev/null 2>&1
 }
-say "Autopilot on $DIR for $HOURS h. Log: $LOG. Stop: shortcuts\\18 Stop Autopilot.bat"
+say "Autopilot on $DIR for $HOURS h. Log: $LOG. Stop: windows\shortcuts\\18 Stop Autopilot.bat"
 n=0; waits=0
 while :; do
   [ -f "$STOP" ] || [ -f "$DIR/AUTOPILOT.stop" ] && { say "Stopped by the owner."; break; }

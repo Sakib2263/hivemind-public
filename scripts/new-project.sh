@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Starts or prepares a game project and records the answers in project.yaml, which every later step reads
-# (which playbook, SDKs, builds, QA, release). Started by "shortcuts\8 New Project.bat".
+# (which playbook, SDKs, builds, QA, release). Started by "windows\shortcuts\8 New Project.bat".
 # Never overwrites an existing file. Can rename the game and the folder of an existing project or reskin.
 KIT="$(cd "$(dirname "$0")/.." && pwd)"; WORK="$(dirname "$KIT")"
 pick() {  # $1 question, rest = options -> REPLY
