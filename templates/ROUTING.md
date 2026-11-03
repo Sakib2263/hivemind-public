@@ -19,6 +19,11 @@ in `mac-linux/` or `mac-linux/shortcuts/` as a `.command` file, and a relay `dir
 ask the owner to open `windows\Start Hivemind.bat` (Mac/Linux: `mac-linux/Start Hivemind.command`), and wait.
 Never quietly do worker jobs in Claude because the relay is off. Check again before each new batch of jobs.
 
+**Tokens over speed.** Claude's quota is the limit that matters, not time. Never skip the relay or do worker jobs in
+Claude because the relay feels slower: a job that takes 10 minutes on a free model beats 2 minutes of Claude tokens.
+Only when the owner explicitly asks for speed ("fast", "skip the relay", "do it yourself") may Claude trade tokens
+for time, and it says so in the opening line. The tiny-change rule (section 2) is the only standing exception.
+
 ## 1. Open every task with one line
 `class · lead model · workers · expected result`
 Example: `feature · Sonnet · opencode + review + gate build · level select screen in src/ui/levels.js`

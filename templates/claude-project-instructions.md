@@ -22,5 +22,7 @@ could do, do this first in the chat, before anything else:
    exist. Games: follow the game-studio-lead skill and <hivemind>\stacks\<engine>.md.
    No project.yaml in a game project? Ask the intake questions first (ROUTING.md section 9a).
 Don't re-read these files later in the same chat. Check the heartbeat again before each new batch of relay jobs.
+Tokens over speed: my Claude quota is the limit, not time. Never skip the relay because it feels slower; follow the
+relay priorities (ROUTING.md, templates/routing/models.md) unless I explicitly ask for speed.
 Plain language, short replies, documents as .md.
 ---
