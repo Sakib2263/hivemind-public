@@ -29,6 +29,14 @@
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 R="$ROOT/relay"; IN="$R/inbox"; OUT="$R/outbox"; DONE="$R/done"; LOCKS="$R/locks"
 mkdir -p "$IN" "$OUT" "$DONE" "$LOCKS"
+# one relay only: a second copy would take the same jobs and clear the first one's folder locks
+PIDF="$R/relay.pid"
+hb_age=$(( $(date +%s) - $(tr -dc 0-9 2>/dev/null < "$R/heartbeat" || echo 0) ))   # a running relay writes it every 5 s
+if [ "$hb_age" -lt 20 ] || { [ -f "$PIDF" ] && kill -0 "$(cat "$PIDF")" 2>/dev/null && [ "$hb_age" -lt 60 ]; }; then
+  echo "The relay is already running in another window. Nothing to do: leave that one open."; exit 3
+fi
+echo $$ > "$PIDF"
+trap 'rm -f "$PIDF" "$R/heartbeat"' EXIT; trap 'exit 0' INT TERM HUP   # closing the window frees the slot at once
 rm -rf "$LOCKS"/* 2>/dev/null   # locks left by a relay that was closed mid-job
 export PATH="$HOME/.local/bin:$PATH"
 export NVM_DIR="$HOME/.nvm"; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" >/dev/null

@@ -1,6 +1,6 @@
 # Hivemind: one lead AI, a team of models
 
-_Last updated: 2026-11-04_
+_Last updated: 2026-11-05_
 
 Claude leads: it plans, reviews and decides. Free and low-cost models do most of the building: GLM and
 DeepSeek through opencode, Gemini through Antigravity, Codex with any ChatGPT login. Scripts do the chores

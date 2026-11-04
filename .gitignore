@@ -28,3 +28,5 @@ relay/awake.state
 relay/.keep-awake.pid
 logs/overlay-refresh.log
 logs/overlay-state.txt
+relay/relay.pid
+logs/overlay-error.log

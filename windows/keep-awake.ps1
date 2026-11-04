@@ -8,7 +8,8 @@ try { Add-Type -Name W -Namespace Hm -MemberDefinition '[DllImport("kernel32.dll
       $cw = [Hm.W]::GetConsoleWindow(); if ($cw -ne [System.IntPtr]::Zero) { [void][Hm.W]::ShowWindow($cw, 0) } } catch { }
 Add-Type -Name P -Namespace HmAwake -MemberDefinition '[DllImport("kernel32.dll")] public static extern uint SetThreadExecutionState(uint f);'
 $mutex = New-Object System.Threading.Mutex($false, 'HivemindKeepAwake')   # one copy only
-if (-not $mutex.WaitOne(0)) { exit }
+$got = $false; try { $got = $mutex.WaitOne(0) } catch [System.Threading.AbandonedMutexException] { $got = $true }
+if (-not $got) { exit }
 
 $Root  = Split-Path -Parent $PSScriptRoot
 $Relay = Join-Path $Root 'relay'
@@ -37,4 +38,4 @@ while ($true) {
     Start-Sleep -Seconds 30
 }
 [void][HmAwake.P]::SetThreadExecutionState($CONT); try { 'off' | Set-Content $State } catch { }
-$mutex.ReleaseMutex()
+try { $mutex.ReleaseMutex() } catch { }

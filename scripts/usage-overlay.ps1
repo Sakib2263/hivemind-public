@@ -24,8 +24,14 @@ $Startup = Join-Path ([Environment]::GetFolderPath('Startup')) 'Hivemind Usage O
 if (Test-Path $Startup) {   # an entry from before a folder move: point it at the current Start Hivemind
     try { $sc = (New-Object -ComObject WScript.Shell).CreateShortcut($Startup); if ($sc.TargetPath -ne $Bat) { $sc.TargetPath = $Bat; $sc.WorkingDirectory = (Split-Path $Bat); $sc.Save() } } catch { }
 }
-$mutex = New-Object System.Threading.Mutex($false, 'HivemindUsageOverlay')   # one copy only
-if (-not $mutex.WaitOne(0)) { exit }
+$ErrLog = Join-Path $Root 'logs\overlay-error.log'   # the window is hidden from the console: errors go here
+function Log-Error($e) { try { "$(Get-Date -Format s) $e $($e.ScriptStackTrace)" | Add-Content $ErrLog } catch { } }
+trap { Log-Error $_; continue }
+# one copy only. A second launch (20 Usage Overlay, Start Hivemind) asks the open window to come back, then exits.
+$mutex = New-Object System.Threading.Mutex($false, 'HivemindUsageOverlay')
+$ShowMe = New-Object System.Threading.EventWaitHandle($false, [System.Threading.EventResetMode]::AutoReset, 'HivemindUsageOverlayShow')
+$got = $false; try { $got = $mutex.WaitOne(0) } catch [System.Threading.AbandonedMutexException] { $got = $true }   # an old copy crashed: take over
+if (-not $got) { [void]$ShowMe.Set(); exit }
 
 function Brush($hex) { (New-Object System.Windows.Media.BrushConverter).ConvertFromString($hex) }
 function Text($s, $hex, $size = 12, $width = 0, $bold = $false) {
@@ -126,7 +132,8 @@ function Bar($pct, $c) {
     $bar
 }
 
-function Render {
+function Render { try { Render-Now } catch { Log-Error $_ } }
+function Render-Now {
     $stack.Children.Clear()
     $d = $null
     try { $d = Get-Content $Json -Raw -Encoding UTF8 | ConvertFrom-Json } catch { }
@@ -224,19 +231,28 @@ $w.Add_SizeChanged({   # a bigger view near the screen edge: move it back inside
     if ($w.Left + $w.ActualWidth -gt $wa.Right) { $w.Left = [math]::Max($wa.Left, $wa.Right - $w.ActualWidth - 4) }
     if ($w.Top + $w.ActualHeight -gt $wa.Bottom) { $w.Top = [math]::Max($wa.Top, $wa.Bottom - $w.ActualHeight - 4) }
 })
-$w.Add_LocationChanged({ try { "$([int]$w.Left),$([int]$w.Top)" | Set-Content $PosFile } catch { } })
+$w.Add_LocationChanged({ if ($w.Left -gt -10000 -and $w.Top -gt -10000) { try { "$([int]$w.Left),$([int]$w.Top)" | Set-Content $PosFile } catch { } } })
+function Place-Home { $wa = [System.Windows.SystemParameters]::WorkArea; $w.Left = $wa.Right - $w.ActualWidth - 12; $w.Top = $wa.Bottom - $w.ActualHeight - 12 }
 $w.Add_Loaded({
     $p = if (Test-Path $PosFile) { (Get-Content $PosFile -Raw).Trim() -split ',' } else { $null }
     $wa = [System.Windows.SystemParameters]::WorkArea
-    if ($p -and $p.Count -eq 2 -and [int]$p[0] -lt $wa.Right - 40 -and [int]$p[1] -lt $wa.Bottom - 40) { $w.Left = [int]$p[0]; $w.Top = [int]$p[1] }
-    else { $w.Left = $wa.Right - $w.ActualWidth - 12; $w.Top = $wa.Bottom - $w.ActualHeight - 12 }
+    if ($p -and $p.Count -eq 2 -and [int]$p[0] -ge $wa.Left -and [int]$p[1] -ge $wa.Top -and [int]$p[0] -lt $wa.Right - 40 -and [int]$p[1] -lt $wa.Bottom - 40) { $w.Left = [int]$p[0]; $w.Top = [int]$p[1] }
+    else { Place-Home }   # no saved place, or it was off screen (other monitor, Show desktop)
 })
 
 $t1 = New-Object System.Windows.Threading.DispatcherTimer; $t1.Interval = [TimeSpan]::FromSeconds(30); $t1.Add_Tick({ Render }); $t1.Start()
 $t2 = New-Object System.Windows.Threading.DispatcherTimer; $t2.Interval = [TimeSpan]::FromMinutes(5); $t2.Add_Tick({ Refresh-Data }); $t2.Start()
 $t3 = New-Object System.Windows.Threading.DispatcherTimer; $t3.Interval = [TimeSpan]::FromSeconds(1)   # a refresh finished: show it now
-$t3.Add_Tick({ if ($script:Busy -and $script:Proc -and $script:Proc.HasExited) { $script:Busy = $false; Render } }); $t3.Start()
+$t3.Add_Tick({
+    if ($script:Busy -and $script:Proc -and $script:Proc.HasExited) { $script:Busy = $false; Render }
+    if ($ShowMe.WaitOne(0)) {   # launched again: bring this window back on screen
+        $w.Show(); $w.WindowState = 'Normal'; $w.Topmost = $true
+        $wa = [System.Windows.SystemParameters]::WorkArea
+        if ($w.Left -lt $wa.Left -or $w.Top -lt $wa.Top -or $w.Left -gt $wa.Right - 40 -or $w.Top -gt $wa.Bottom - 40) { Place-Home }
+        [void]$w.Activate(); Refresh-Data $true
+    }
+}); $t3.Start()
 Render
 Refresh-Data
-[void]$w.ShowDialog()
-$mutex.ReleaseMutex()
+try { [void]$w.ShowDialog() } catch { Log-Error $_ }
+try { $mutex.ReleaseMutex() } catch { }

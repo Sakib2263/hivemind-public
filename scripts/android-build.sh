@@ -115,7 +115,7 @@ if [ -f "$P/package.json" ] && grep -q '"build"' "$P/package.json"; then
 else
   SRC="$P"
 fi
-rsync -a --delete --exclude .git --exclude node_modules --exclude builds --exclude graphify-out --exclude store \
+rsync -a --delete --exclude .git --exclude node_modules --exclude builds --exclude graphify-out --exclude store --exclude store-listing --exclude '_*.tgz' \
   --exclude '*.md' --exclude android.env --exclude .android --exclude native-android --exclude google-services.json \
   --exclude releases --exclude tools --exclude tests --exclude prototype --exclude _src-audio "$SRC/" "$W/www/"
 if [ -n "$WEB_ENTRY" ] && [ "$WEB_ENTRY" != "index.html" ]; then
