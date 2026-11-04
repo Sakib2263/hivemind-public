@@ -1,4 +1,4 @@
-# More games + exit prompt (shared by every Your Studio web game)
+# More games + exit prompt (shared by every web game of yours)
 
 Files here:
 - `games.json`: the catalog (Play package id, name, 128px icon inlined so it works offline)

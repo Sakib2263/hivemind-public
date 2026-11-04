@@ -77,11 +77,15 @@ An update signed with a different key is refused by Google Play, so never let a 
    Read `.last`: check the `Upload key SHA-256` line and the new version noted for the next upload.
 4. Never upload, publish or submit anything yourself. The owner uploads the AAB in Play Console.
 
-Unity project? Its build comes from Unity (Hivemind `plans/UNITY-PLAN.md`); the key check and the listing steps
+Unity project? Its build comes from Unity (Hivemind `stacks/unity.md`); the key check and the listing steps
 are the same.
 
 ## 4. Capture reference screenshots from the tested build
 
+These usually exist already: every QA pass keeps store shots automatically (game-developer, "Store shots"):
+keepers in `store/screenshots/raw/` with `SHOTS.md`, sized by `python3 $HIVEMIND/scripts/store-shots.py make
+<project>` into `store/google-play/reference/`. Check `store-shots.py status <project>` first; capture more
+only when there are fewer than 4 good ones or the build changed what they show. Never ask the owner for them.
 Use the same headless browser QA you already run (game-developer test gate), on the build that passed:
 - Portrait games: 1080x1920 (9:16). Landscape: 1920x1080. At least 4 shots; Play needs 3+ at 1080px for games
   to be eligible for large-format placements, 2 minimum to publish, 8 maximum per device type.

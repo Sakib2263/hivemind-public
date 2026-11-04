@@ -117,7 +117,9 @@ This is how this user works. Follow it every time.
 4. **Verify what you changed**, on the screen size where the user saw the bug (portrait
    phone 390x844, landscape phone 915x412, desktop 1440x900), with a screenshot you
    actually look at.
-5. **Run the suites** sequentially in the background, then build.
+5. **Run the suites** sequentially in the background, then build. A build that leaves the machine (APK,
+   release, portal upload, store submission) also keeps store shots from that QA run, unasked:
+   game-developer "Store shots" (`store/screenshots/raw/`, sized with `store-shots.py make`).
 6. **Ask before anything public or irreversible:** store submission, sandbox publish,
    catalog update, sending messages, deleting user files. Upload of a build archive to
    the user's own console is fine when they asked to "publish" or "resubmit".

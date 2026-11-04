@@ -64,7 +64,6 @@ Optional: `6 Optional - Android Build Tools` (APKs), `8 Optional - Reverse Engin
 | 10 Build Android App | Test APK or signed Play release |
 | 11 Install APK on Phone | Installs an APK on a USB phone |
 | 12 Add My Skills | Brings in your own skills from `skills/inbox` |
-| 13 Export Public Version | Owner only: publishes the public copy |
 | 14 Start Video Studio | Starts your linked ComfyUI |
 | 17 Autopilot / 18 Stop Autopilot | Unattended work through a TASKS.md, and stopping it |
 | 19 Usage | Full usage report |

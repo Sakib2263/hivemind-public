@@ -149,8 +149,7 @@ def set_key(name, value=None):
 
 
 def nv_models():
-    m = models_env()
-    return [v for v in (m.get("NVIDIA_MODEL"), m.get("NVIDIA_MODEL2")) if v]
+    return [v for k, v in models_env().items() if k.startswith("NVIDIA_") and v.startswith("nvidia/")]
 
 
 def nvidia_provider():
@@ -173,6 +172,23 @@ def nvidia_provider():
     os.makedirs(os.path.dirname(OC_CONF), exist_ok=True)
     with open(OC_CONF, "w", encoding="utf-8") as f:
         json.dump(conf, f, indent=2)
+
+
+def opencode_tmp():
+    """Let headless opencode workers use /tmp (scratch installs, test scripts). Owner-approved Nov 2026: /tmp only."""
+    try:
+        conf = json.load(open(OC_CONF, encoding="utf-8")) if os.path.exists(OC_CONF) else {}
+    except ValueError:
+        print(f"[SKIP] {OC_CONF} isn't plain JSON: add permission.external_directory {{'/tmp/*': 'allow'}} by hand"); return
+    conf.setdefault("$schema", "https://opencode.ai/config.json")
+    perm = conf.setdefault("permission", {})
+    ed = perm.get("external_directory")
+    if not isinstance(ed, dict): ed = {"*": ed or "ask"}
+    if ed.get("/tmp/*") == "allow" and ed.get("/tmp/**") == "allow": return
+    ed.update({"/tmp/*": "allow", "/tmp/**": "allow"}); perm["external_directory"] = ed
+    os.makedirs(os.path.dirname(OC_CONF), exist_ok=True)
+    with open(OC_CONF, "w", encoding="utf-8") as f: json.dump(conf, f, indent=2)
+    print("opencode: workers may use /tmp")
 
 
 def opencode_auth():
@@ -230,6 +246,8 @@ if __name__ == "__main__":
         sync_template()
     elif a[0] == "set" and len(a) >= 2:
         sys.exit(set_key(a[1], a[2] if len(a) > 2 else None))
+    elif a[0] == "opencode-tmp":
+        opencode_tmp()
     elif a[0] == "opencode-auth":
         sys.exit(opencode_auth())
     elif a[0] == "nvidia-check":

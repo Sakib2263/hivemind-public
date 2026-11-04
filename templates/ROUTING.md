@@ -118,7 +118,7 @@ Constraints: <project extras only; usually none>
 | agy | model: hard (optional) | Antigravity (Gemini): reading, second opinions, reviews |
 | review | base: main, or commit: <sha> (optional) | Reviews uncommitted changes with `gates/review.md`. Engines: REVIEW_ENGINES |
 | gate | gate: build / security / release | Runs `gates/<gate>.md`. Engines: GATE_ENGINES |
-| graph | none | Body "update" builds or refreshes graphify-out/; any other text is a question to the graph |
+| graph | none | Body: a question, `explain <name>`, `path <A> <B>`, `affected <name>`, `hubs`, or `update`. Code map, no model, seconds. The relay also keeps the map current after every job |
 | git-commit | none | Body = one-line message; commits all changes in that repo |
 | android, files, upload, install, comfy, video | none | Scripts, no model: APK builds, deletes, uploads, phone installs, AI shots, video renders. Body formats: `templates/routing/workers.md` |
 | codex, codex-review, deepseek | effort (codex) | Codex: any ChatGPT login. DeepSeek: API key. In the fallback chains; skipped automatically when not usable |
@@ -140,8 +140,12 @@ tries the next one in its chain by itself (chains in `config/models.env`, or a `
   a batch of jobs. Skip a worker marked LIMIT HIT or OUT and use its fallback. Claude LOW: say so in one line and
   lean harder on free workers. Claude and Antigravity % are live (cached 5 min). Limits: `config/limits.env`.
 - New chat per task. Long chats cost far more.
-- Before exploring code: read `graphify-out/GRAPH_REPORT.md`, or send a `graph` question. Run a
-  `graph` "update" job after big changes.
+- **Project memory (graphify), every new chat:** read the TASKS.md Handoff, then `graphify-out/GRAPH_REPORT.md`
+  (one short file: hubs, modules, what connects to what). Never list or read source folders to "get oriented".
+  Need a specific place in the code: send a `graph` job (`explain PlayerController`, `affected saveGame`,
+  `where is the coin reward granted`) and open only the files and lines it names. The map refreshes by itself
+  (every relay job and every commit); its "Built from commit" line tells you if it's behind. No report yet:
+  send `graph` with body `update` first (seconds, no tokens).
 - Keep CLAUDE.md and AGENTS.md short (aim under 4k tokens each).
 - TASKS.md holds current work only. Move finished rows to DONE.md when the board passes about 15 rows.
 - Split any spec over about 15k tokens into parts, and point jobs at the part they need.
@@ -157,7 +161,7 @@ directly for reading and planning help.
 | Material | Allowed |
 |---|---|
 | Our own games and code | every worker |
-| Company work (your company / Your Studio, no client NDA) | Claude, Antigravity (work Google account), opencode GLM and DeepSeek free (zero data retention) |
+| Company work (our own company, no client NDA) | Claude, Antigravity (work Google account), opencode GLM and DeepSeek free (zero data retention) |
 | Client or NDA work | Claude and Antigravity. opencode GLM/DeepSeek free only if the owner OKs it. Never OpenRouter free, NVIDIA build (nv, nv2) or Zen models that train on data (Big Pickle, Flint, MiMo, Nemotron) |
 | A contract that bans AI tools | nothing: no AI on it at all, not even anonymised |
 | API keys, passwords, player or customer personal data | never in a prompt, file or log |

@@ -168,6 +168,24 @@ Run suites one after another in the background with a done-file each; delete old
 done-files first; never build while they run. When an old test fails because the UI
 intentionally changed, update the test in the same turn and say so.
 
+### Store shots (automatic, never ask)
+Every QA pass on a build that will leave the machine (test APK, release build, portal upload, store
+submission) also collects store screenshots. Do it without being asked, in the same browser run:
+- **Capture at store size:** portrait viewport 540x960 with `deviceScaleFactor: 2` (= 1080x1920), landscape
+  960x540 at 2x (= 1920x1080). Graphics high for these shots only. No debug overlay, FPS counter, cheat menu,
+  test-ad banner, toast or placeholder text.
+- **Keep the moments people would share:** funny and surprising ones first (ragdoll flops, wild physics, near
+  misses, huge combos, a fail that makes you laugh), then the hook, the core loop, progression or level map,
+  something new (mechanic, booster, boss), the reward or win screen. Mid-action beats static menus.
+- **Save keepers** to `store/screenshots/raw/NN-<moment>.png` (01 = the best hook) and add one line per shot
+  to `store/screenshots/SHOTS.md`: file | what happens | why it's fun | portrait or landscape.
+  Aim for 6-12 keepers; when a better moment turns up later, replace the weakest one instead of piling up.
+- **Make every size:** `python3 $HIVEMIND/scripts/store-shots.py make <project>` writes Play screenshots to
+  `store/google-play/reference/` (1080x1920 or 1920x1080, no transparency) and Playgama covers
+  (800x800, 1080x1920, 1920x1080) to `store/playgama/covers/`. `status` shows what is still missing.
+- Mention it in one line in the final summary ("store shots: 8 keepers, sizes made"). Never invent features in
+  shots: they show the real build.
+
 ## 5. Shipping per platform
 
 Every target ships from its own index file. A fix in game.js goes out to each target with
@@ -185,7 +203,8 @@ its own version bump and upload; a fix in one index file goes out only to that t
 5. Sandbox (public, unmoderated): only when the user asks. `get_sandbox_state` first,
    `publish_sandbox` with an `updateNote` (plain first person, 80-500 chars), then follow
    `get_publications` until PUBLISHED. Same URL on every update.
-6. Covers: 800x800, 1080x1920, 1920x1080, from the asset designer.
+6. Covers: 800x800, 1080x1920, 1920x1080: `store/playgama/covers/` (made from the QA store shots,
+   section 4), or key art from the asset designer when the owner wants it.
 7. If the S3 PUT is blocked by the proxy, the user must allow the domain in claude.ai
    capabilities; then retry once.
 
@@ -200,7 +219,8 @@ its own version bump and upload; a fix in one index file goes out only to that t
   (applovin-max-integration), IAP via Play Billing. Release steps: google-play-release.
 - Publisher prototypes (Voodoo, Supersonic) need a Unity APK with their SDK. Hand off the
   GDD, levels JSON and art; do not try to port three.js code line by line.
-- Listing: 512 icon, 1024x500 feature graphic, real gameplay screenshots only.
+- Listing: 512 icon, 1024x500 feature graphic, real gameplay screenshots only (`store/google-play/reference/`,
+  from the QA store shots, section 4).
 
 **PC**
 - itch.io: upload the index.web.html pack (ads off unless the owner says) as HTML5. Steam/desktop: Electron (simplest) or Tauri

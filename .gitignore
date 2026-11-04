@@ -23,3 +23,8 @@ relay/.status.*
 logs/overlay-pos.txt
 logs/overlay-state.txt
 __pycache__/
+relay/activity
+relay/awake.state
+relay/.keep-awake.pid
+logs/overlay-refresh.log
+logs/overlay-state.txt

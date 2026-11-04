@@ -79,6 +79,7 @@ function Btn($glyph, $tip, $action, $on = $false) {   # header icon button (Sego
 function Buttons($panel) {
     $g = New-Object System.Windows.Controls.StackPanel; $g.Orientation = 'Horizontal'; $g.Margin = '6,0,0,0'
     [void]$g.Children.Add((Btn $(if ($script:Compact) { 0xE923 } else { 0xE921 }) $(if ($script:Compact) { 'Expand' } else { 'Minimise to one line' }) { param($s, $e) $e.Handled = $true; Toggle }))
+    [void]$g.Children.Add((Btn 0xE72C 'Refresh now (asks every provider again)' { param($s, $e) $e.Handled = $true; Refresh-Data $true }))
     [void]$g.Children.Add((Btn 0xE8FD $(if ($script:Detailed) { 'Simple view' } else { 'Detailed view' }) { param($s, $e) $e.Handled = $true; Toggle-View } $script:Detailed))
     [void]$g.Children.Add((Btn 0xE8BB 'Close (Start Hivemind or 20 Usage Overlay opens it again)' { param($s, $e) $e.Handled = $true; $w.Close() }))
     [void]$panel.Children.Add($g)
@@ -136,7 +137,8 @@ function Render {
     [void]$left.Children.Add((Text 'Usage left' '#E6EDF3' 13 0 $true))
     if (-not $d) { [void]$left.Children.Add((Text 'loading...' '#8B949E' 11)); Buttons $right; [void]$stack.Children.Add($head); return }
     $age = [int]([DateTimeOffset]::Now - (Dto $d.updated)).TotalMinutes
-    $note = if ($age -gt 15) { "updated $age min ago" } else { 'updated ' + (Dto $d.updated).ToLocalTime().ToString('HH:mm') }
+    $note = if ($script:Busy) { 'refreshing...' } elseif ($age -gt 15) { "updated $age min ago" } else { 'updated ' + (Dto $d.updated).ToLocalTime().ToString('HH:mm') }
+    try { if ((Get-Content (Join-Path $Root 'relay\awake.state') -Raw).Trim() -eq 'on') { $note += '  |  awake (jobs running)' } } catch { }   # windows\keep-awake.ps1
     if ($script:Compact) {   # one line: Claude left + how many need attention
         $cl = Simple-Rows $d | Where-Object { $_.name -eq 'Claude' } | Select-Object -First 1
         $bad = @($d.rows | Where-Object { $_.status -like 'LIMIT*' -or $_.status -eq 'OUT' -or $_.status -eq 'LOW' })
@@ -189,18 +191,20 @@ function Render {
     }
 }
 
-function Refresh-Data {   # runs scripts/usage.py in Ubuntu, hidden; Render picks up the new USAGE.json
+function Refresh-Data($fresh = $false) {   # runs scripts/usage.py in Ubuntu, hidden; re-draws as soon as it finishes
+    if ($script:Proc -and -not $script:Proc.HasExited) { return }   # one refresh at a time
     try {   # no console window at all (Start-Process -WindowStyle Hidden still opens a Terminal tab on Windows 11)
-        $si = New-Object System.Diagnostics.ProcessStartInfo 'wsl.exe', '-e python3 ./scripts/usage.py quiet'
+        $arg = 'quiet' + $(if ($fresh) { ' fresh' } else { '' })   # fresh: ask Claude/Antigravity now, not the 5-minute cache
+        $si = New-Object System.Diagnostics.ProcessStartInfo 'wsl.exe', "-e bash -c `"python3 ./scripts/usage.py $arg > logs/overlay-refresh.log 2>&1`""
         $si.WorkingDirectory = $Root; $si.UseShellExecute = $false; $si.CreateNoWindow = $true
-        [void][System.Diagnostics.Process]::Start($si)
-    } catch { }
+        $script:Proc = [System.Diagnostics.Process]::Start($si); $script:Busy = $true; Render
+    } catch { $script:Busy = $false }
 }
 
 # menu
 $menu = New-Object System.Windows.Controls.ContextMenu
 function Item($label, $action) { $i = New-Object System.Windows.Controls.MenuItem; $i.Header = $label; $i.Add_Click($action); [void]$menu.Items.Add($i); $i }
-[void](Item 'Refresh now' { Refresh-Data })
+[void](Item 'Refresh now' { Refresh-Data $true })
 [void](Item 'Minimise / expand' { Toggle })
 [void](Item 'Simple / detailed view' { Toggle-View })
 [void](Item 'Open full report' { if (Test-Path $Report) { Start-Process notepad.exe -ArgumentList "`"$Report`"" } })
@@ -230,6 +234,8 @@ $w.Add_Loaded({
 
 $t1 = New-Object System.Windows.Threading.DispatcherTimer; $t1.Interval = [TimeSpan]::FromSeconds(30); $t1.Add_Tick({ Render }); $t1.Start()
 $t2 = New-Object System.Windows.Threading.DispatcherTimer; $t2.Interval = [TimeSpan]::FromMinutes(5); $t2.Add_Tick({ Refresh-Data }); $t2.Start()
+$t3 = New-Object System.Windows.Threading.DispatcherTimer; $t3.Interval = [TimeSpan]::FromSeconds(1)   # a refresh finished: show it now
+$t3.Add_Tick({ if ($script:Busy -and $script:Proc -and $script:Proc.HasExited) { $script:Busy = $false; Render } }); $t3.Start()
 Render
 Refresh-Data
 [void]$w.ShowDialog()

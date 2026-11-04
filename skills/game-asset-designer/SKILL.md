@@ -121,7 +121,9 @@ Ad creatives    15-30 s, hook in the first 3 s, real gameplay or honest mock cle
 
 Concept or key art may be stylised, but screenshots must show the real game, and no
 listing image may show a feature the build does not have. Capture real screenshots with the
-developer's Playwright tools at the store size, hide debug UI, pick moments with action.
+developer's Playwright tools at the store size, hide debug UI, pick moments with action. QA keeps them by
+itself in `store/screenshots/raw/` (funny and exciting moments first, listed in SHOTS.md) and
+`scripts/store-shots.py` makes the Play and Playgama sizes: start from those before capturing new ones.
 
 ## 7. Audio
 

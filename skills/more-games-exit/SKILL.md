@@ -5,7 +5,7 @@ description: "Add the Your Studio More games list and the back-button exit promp
 
 # More games + exit prompt
 
-One shared module for every Your Studio web game. Proven in a shipped Android game.
+One shared module for every web game of yours. Proven in a shipped Android game.
 Kit folder: `D:\Work\hivemind\templates\more-games\` (`games.json`, `more-games.src.js`, `more-games.js`, `build.py`).
 Plain language with the owner. Ponytail: reuse the module, never rewrite it per game.
 

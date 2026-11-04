@@ -16,7 +16,8 @@ Follow `ROUTING.md` in the Hivemind (task classes, relay jobs, gates, token rule
 - Commit with a `git-commit` job after review and gates pass.
 
 ## Before any task
-- Read TASKS.md (board and Handoff). Read `graphify-out/GRAPH_REPORT.md` before exploring code.
+- Read TASKS.md (board and Handoff), then `graphify-out/GRAPH_REPORT.md`. Find code with a relay `graph` job
+  (`explain X`, `affected X`, a question), never by reading whole folders.
 
 ## After any task
 - Update TASKS.md: status, gate result, files, Handoff.

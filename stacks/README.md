@@ -38,9 +38,9 @@ After that, every step (SDKs, building, QA, release) follows the playbook for th
 |---|---|---|
 | Who builds | free workers (opencode GLM / DeepSeek), Claude reviews | Claude + workers for C# scripts; scenes and prefabs only through the editor (Unity MCP) |
 | QA | headless browser tests + screenshots at 390x844, 915x412, 1440x900 | batchmode compile + EditMode tests, console check, then device / browser test |
-| Android build | Capacitor: `10 Build Android App.bat` or relay `android` | Unity build (relay `unity` worker, planned: UNITY-PLAN U2) |
+| Android build | Capacitor: `10 Build Android App.bat` or relay `android` | Unity build (relay `unity` worker, planned) |
 | SDKs | portal JS SDKs, AdMob through Capacitor | LevelPlay, Unity IAP, publisher SDKs, Firebase / GameAnalytics |
-| Status in Hivemind | ready | partly ready: playbook yes, relay worker and gate planned (plans/UNITY-PLAN.md) |
+| Status in Hivemind | ready | partly ready: playbook yes, relay worker and gate planned (stacks/unity.md) |
 
 ## Reskins (both stacks)
 A reskin is a copy of a base game with a new name, bundle id, look and tuning. Follow the AI OS GameDev idea:

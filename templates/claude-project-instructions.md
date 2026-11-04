@@ -19,7 +19,8 @@ could do, do this first in the chat, before anything else:
    work without the relay: doing it all in Claude burns the quota the free workers should use.
 2. Read <hivemind>\templates\ROUTING.md (rules, workers, relay jobs, token saving).
 3. In the project folder, read project.yaml, then TASKS.md (continue from its Handoff) and PLAN.md if they
-   exist. Games: follow the game-studio-lead skill and <hivemind>\stacks\<engine>.md.
+   exist, then graphify-out/GRAPH_REPORT.md (the code map). Never read source folders to get oriented: find code
+   with a relay `graph` job (ROUTING.md section 6) and open only what it names. Games: follow the game-studio-lead skill and <hivemind>\stacks\<engine>.md.
    No project.yaml in a game project? Ask the intake questions first (ROUTING.md section 9a).
 Don't re-read these files later in the same chat. Check the heartbeat again before each new batch of relay jobs.
 Tokens over speed: my Claude quota is the limit, not time. Never skip the relay because it feels slower; follow the

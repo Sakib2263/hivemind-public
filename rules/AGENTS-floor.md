@@ -11,8 +11,9 @@ If the task or plan looks wrong, stop and say so as a blocker in your final mess
 
 ## Before you start
 - Read the project's AGENTS.md, then only the task's part of TASKS.md / PLAN.md.
-- If `graphify-out/GRAPH_REPORT.md` exists, read it before opening source files, and use
-  `graphify query "<question>"` to find code instead of reading whole folders.
+- If `graphify-out/GRAPH_REPORT.md` exists, read it before opening source files, and find code with
+  `graphify query "<question>"`, `graphify explain "<name>"` or `graphify affected "<name>"` instead of reading
+  whole folders. Open only the files and lines it points to.
 
 ## Code
 - Smallest change that fully solves the task. Reuse existing code, helpers and styles before writing new ones.

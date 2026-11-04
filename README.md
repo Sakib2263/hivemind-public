@@ -54,7 +54,7 @@ limits as of November 2026; `Usage` (shortcut 19, or the live window 20) shows y
 | Claude | Pro, $20/month | A 5-hour window plus a weekly cap; Anthropic's guidance is about 45 messages per 5 hours, shared by chats and Claude Code | Enough to lead: plans, reviews, small fixes. Max plans give 5x or 20x |
 | opencode Zen free models (GLM, DeepSeek) | free | Not published; a shared rate limit that pushes back after several long jobs | The main builders. When one is busy, the relay moves to the next |
 | Antigravity (Gemini) | free tier | A weekly agent quota; size not published (it has gone down over time) | Reviews, reading, second opinions |
-| NVIDIA build (build.nvidia.com), optional | free key | Per-minute rate limit, no daily cap published | Extra builders and reviewers (MiniMax, Nemotron) when the Zen models are busy. Not for client or NDA work |
+| NVIDIA build (build.nvidia.com), optional | free key | Not published; about 40 requests a minute per account is reported, shared by all its models, no daily cap | Backup GLM and DeepSeek when Zen is busy, plus MiniMax, Nemotron, Mistral, Laguna, Step 5 for reviews and reading. Not for client or NDA work |
 | OpenRouter free models | free | 20 requests a minute and 50 a day (1,000 a day once you have ever bought 10 USD of credits) | Extra helpers through PAL |
 | Codex | any ChatGPT login | Depends on the ChatGPT plan; small on free | Joins the chains whenever it has quota |
 | Local tools (ComfyUI, ACE-Step, Chatterbox) | free | Your own GPU | Images, clips, music, voice |

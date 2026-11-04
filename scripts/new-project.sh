@@ -139,6 +139,7 @@ if [ ! -f .gitignore ]; then
   fi
 fi
 if [ ! -d .git ]; then git init -q && git add -A && git -c user.name=hivemind -c user.email=hivemind@local commit -qm "project start ($ENGINE, $START)" && echo "git ready"; fi
+bash "$KIT/scripts/graph.sh" "$PWD" ensure   # project memory: code map + git hooks that refresh it on every commit
 
 echo; echo "Ready: $NEWDEST"
 echo "Playbook: Hivemind\\stacks\\$ENGINE.md"

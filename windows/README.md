@@ -53,7 +53,6 @@ Folder shortcuts: drag a project folder onto the .bat, or double-click and paste
 | 10 Build Android App.bat | Drag a project on it: asks for app name, bundle id and icon if missing, confirms, then builds a test APK or a signed Play release (AAB + APK) into `builds\android\` |
 | 11 Install APK on Phone.bat | Drag an APK on it: installs it on a phone plugged in by USB (USB debugging on) |
 | 12 Add My Skills.bat | Brings in your own skills: drop skill folders or .skill / .zip files into `skills\inbox\`; they are checked, listed (private by default) and installed |
-| 13 Export Public Version.bat | Owner only: makes the clean public copy (`..\hivemind-public`) and pushes it to the public repo in `config\public.env`. Runs after `Sync - Push` too when AUTO_PUBLISH is on |
 | 19 Usage.bat | Full usage report: live Claude and Antigravity %, tokens and jobs per provider and model (today, 5-hour window, week, month), what's left, reset times |
 | 20 Usage Overlay.bat | Small always-on-top window with usage left per provider, live. Right-click: Refresh, Start with Windows, Close |
 | 21 Asset Library.bat | Drag asset zips or folders onto it (or double-click to file every zip in the Games folder). Shared library + INDEX.md in Games\_Assets |

@@ -46,6 +46,7 @@ def env(path):
 L = env(os.path.join(KIT, "config", "limits.env"))
 M = env(os.path.join(KIT, "config", "models.env"))
 LOW = float(L.get("LOW_PCT") or 20)
+FRESH = "fresh" in sys.argv[1:]
 
 
 def num(v):
@@ -236,12 +237,13 @@ def openrouter_live():
 
 
 def live(provider):
-    """usage-v1 document from clanker-usage (windows with used_pct and resets_at), or None."""
+    """usage-v1 document from clanker-usage (windows with used_pct and resets_at), or None.
+    FRESH (usage.py fresh / overlay "Refresh now"): ask the provider now instead of using the 5-minute cache."""
     exe = shutil.which("clanker-usage") or os.path.join(HOME, ".local", "bin", "clanker-usage")
     if not os.path.exists(exe):
         return None
     try:
-        r = subprocess.run([exe, provider, "json", "--max-age", "300"], capture_output=True, text=True, timeout=45)
+        r = subprocess.run([exe, provider, "json", "--max-age", "0" if FRESH else "300"], capture_output=True, text=True, timeout=45)
         doc = json.loads(r.stdout)
     except (OSError, ValueError, subprocess.SubprocessError):
         return None
@@ -340,11 +342,10 @@ def build():
     for label, spec, budget_key, since, wname in (
         ("opencode GLM (free)", "opencode:free", "OPENCODE_FREE_JOBS_DAY", DAY0, "jobs today"),
         ("opencode DeepSeek (free2)", "opencode:free2", "OPENCODE_FREE2_JOBS_DAY", DAY0, "jobs today"),
-        ("NVIDIA MiniMax (nv)", "opencode:nv", "NVIDIA_JOBS_DAY", DAY0, "jobs today"),
-        ("NVIDIA Nemotron (nv2)", "opencode:nv2", "NVIDIA2_JOBS_DAY", DAY0, "jobs today"),
+        ("NVIDIA build (all nv models)", "opencode:nv", "NVIDIA_JOBS_DAY", DAY0, "jobs today"),
         ("Antigravity jobs", "agy", "AGY_JOBS_WEEK", WEEK0, "jobs this week"),
     ):
-        js = [r for r in lg if r["t"] >= since and (r["spec"] == spec or (spec == "agy" and r["spec"].startswith("agy")))]
+        js = [r for r in lg if r["t"] >= since and (r["spec"] == spec or (spec in ("agy", "opencode:nv") and r["spec"].startswith(spec)))]
         if spec.startswith("opencode:nv") and not js and not env(os.path.join(KIT, "secrets", "keys.env")).get("NVIDIA_API_KEY"):
             continue   # optional provider, not set up
         hit = max([r["t"] for r in js if r["limit"]], default=None)

@@ -123,7 +123,6 @@ Second PC: same steps; `Sync - Pull.bat` keeps both PCs on the same Hivemind ver
 |---|---|
 | Add your own skills | Put folders or `.skill` / `.zip` files in `skills\inbox\`, then `windows\shortcuts\12 Add My Skills.bat` |
 | Send a skill to someone, or upload it to claude.ai | `windows\shortcuts\9 Pack Skills.bat` (zips in `skills-packages\shareable / company / private`). Never send private |
-| Make a public copy of Hivemind (owner only) | `windows\shortcuts\13 Export Public Version.bat` (makes `..\hivemind-public`, lists what still needs a generic rewrite) |
 
 ### F. Videos and content (desktop with an NVIDIA GPU)
 Once:
@@ -209,7 +208,8 @@ Then `5 Check Everything.bat` to confirm each tool answers.
 | Reuse downloaded assets (Kenney zips, fonts, sound packs) across games | Drop zips in the `Games` folder, then `windows\shortcuts\21 Asset Library.bat` (or drag zips onto it). Index: `Games\_Assets\INDEX.md` |
 | Use a different account (Claude, opencode, Codex, Antigravity, keys) | Workflow H |
 | Change a usage limit or budget | `config\limits.env` |
-| Know what's planned next | `NEXT.md`, `plans\UNITY-PLAN.md` |
+| Stop the PC sleeping during long jobs | Automatic while the relay has work (`windows\keep-awake.ps1`, hidden); settings in `config\awake.env` |
+| Get store screenshots for Play or Playgama | Automatic: every QA run before an APK, release or upload keeps the best moments in `<game>\store\screenshots\` and makes all sizes |
 
 ---
 
@@ -221,7 +221,6 @@ Then `5 Check Everything.bat` to confirm each tool answers.
 | `GUIDE.md` | This page |
 | `README.md` | Overview: how it works, what you need, usage limits, relay job format, free models, troubleshooting |
 | `LICENSE`, `CONTRIBUTING.md` | Noncommercial license; how to contribute (fork + pull request) |
-| `NEXT.md` | The to-do list for building Hivemind further, in order (owner only) |
 | `windows\` | Windows: setup steps `0` to `9` (0, 6, 8, 9 optional), `Start Hivemind.bat`, Sync, `README.md`, `shortcuts\` |
 | `mac-linux\` | The same for Mac and Linux, as `.command` files |
 | `my-claude-instructions.txt` | Made by `7 Connect Claude`: your filled-in Project instructions (not on GitHub) |
@@ -244,7 +243,6 @@ Then `5 Check Everything.bat` to confirm each tool answers.
 | `10 Build Android App.bat` | Test APK (no questions) or signed release (asks only what is not decided yet) |
 | `11 Install APK on Phone.bat` | Installs an APK on a USB-connected phone |
 | `12 Add My Skills.bat` | Brings your own skills in from `skills\inbox\` |
-| `13 Export Public Version.bat` | Owner only: makes the clean public copy and pushes it to the public repo (also runs after `Sync - Push` when AUTO_PUBLISH is on) |
 | `14 Start Video Studio.bat` | Starts ComfyUI (AI clips and stills). Leave open while making videos |
 | `15 Start Music Studio.bat` | Opens ACE-Step to make songs and background music |
 | `16 Clone Voice.bat` | Drag a folder with voice.wav + lines.txt onto it: one WAV per line in your cloned voice |
@@ -282,14 +280,14 @@ Then `5 Check Everything.bat` to confirm each tool answers.
 | `release.md` | Before anything public: version, debug code, ads, store rules, screen sizes |
 | `review.md` | Code review checklist for the `review` worker |
 
-### `config\`, `rules\`, `plans\`
+### `config\`, `rules\`
 | File | Purpose |
 |---|---|
 | `config\models.env` | Which model each worker uses, fallback chains, check and review engines. Dated decisions |
+| `config\awake.env` | Keep-awake: on or off, how long to stay awake after the last job, screen on or not |
 | `config\limits.env` | Usage limits and your own budgets per provider (Claude week reset, job budgets). Dated decisions |
 | `config\folders.env` | Extra places where projects may live, outside the work folder (New Project fills it in) |
 | `rules\AGENTS-floor.md` | Rules every worker loads (installed into opencode, Claude Code and Codex) |
-| `plans\UNITY-PLAN.md` | The Unity plan: what is ready, what is planned (U1 to U10), decisions needed |
 
 ### `scripts\` (run by the .bat files; you don't open these)
 | Script | Started by | Does |
@@ -297,6 +295,8 @@ Then `5 Check Everything.bat` to confirm each tool answers.
 | `install-tools.sh` | `2 Install AI Tools.bat` | Installs every tool in Ubuntu |
 | `login.sh` | `3 Log In.bat` | Logs in to each tool |
 | `progress.sh` | Setup, check and key scripts | The live spinner and timer shown while a quiet step runs, so a window never looks stuck |
+| `graph.sh` | Relay (every job, `graph` jobs), New Project | Project memory: builds and refreshes the graphify code map (`graphify-out/GRAPH_REPORT.md`) and the git hooks that refresh it on every commit; answers code questions. No model, no tokens |
+| `store-shots.py` | Claude and workers during QA | Sizes the store screenshots kept from QA (`store/screenshots/raw/`) into Play (1080x1920 / 1920x1080) and Playgama covers |
 | `providers.py` | Log In, Add API Keys, Check Everything, Start Hivemind, usage | Which tools and keys are connected and how to add a missing one; saves keys in `secrets\keys.env`; gives opencode its key |
 | `apply-keys.sh` | `4 Add API Keys.bat` | Connects your keys to PAL |
 | `verify.sh` | `5 Check Everything.bat`, `6 Check All Tools.bat` | Tests tools, models, rules, Android setup |
@@ -312,7 +312,6 @@ Then `5 Check Everything.bat` to confirm each tool answers.
 | `android-build.sh` | `10 Build Android App.bat`, relay `android` jobs | Builds test APKs and signed releases |
 | `check-store-assets.py` | Release build, release check, Claude before publishing | Checks icon, name, bundle id, store art sizes, screenshots and listing text; lists what is MISSING |
 | `add-skills.py` | `12 Add My Skills.bat` | Imports your skills |
-| `export-public.py` | `13 Export Public Version.bat` | Makes the public copy |
 | `usage.py` | `19`/`20` Usage, relay and autopilot after every job | Live Claude and Antigravity quota (clanker-usage), local token logs (Claude Code, opencode, Codex), the relay ledger, OpenRouter; writes `USAGE.md` and `USAGE.json` |
 | `usage-overlay.ps1` | `20 Usage Overlay.bat` | The live usage window (Windows PowerShell) |
 | `assets.py` | `21 Asset Library.bat`, relay `assets` worker | Shared asset library: add, scan, peek, find, list, copy, index |

@@ -13,6 +13,9 @@ You act as a performance UA and ASO manager for casual / hybrid-casual mobile ga
 2. Identify: campaign goal (CPI, ROAS, retention), geos (US vs Global split), season or event deadline, current phase (launch / optimize / scale).
 3. Check the date. Seasonal games (Halloween, Christmas) need an evergreen swap set ready for the day after the event.
 
+Screenshots and creative stills: start from `store/screenshots/SHOTS.md` in the game (real QA moments, funny
+ones first, already sized in `store/google-play/reference/`). Screenshot A/B tests swap the 01 hook shot first.
+
 ## 2. Platform specs (verify yearly; update the Learnings Log if Google changes them)
 
 ### Google Ads App campaigns

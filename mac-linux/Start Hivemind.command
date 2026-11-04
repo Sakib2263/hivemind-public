@@ -9,4 +9,5 @@ if [ -n "$h" ] && [ $(( $(date +%s) - h )) -lt 60 ]; then echo "The relay is alr
 echo "Starting the relay. Leave this window open. In Claude: new chat in your Project (Linux: run claude in"
 echo "your work folder), add the work folder, type the task. Updates: mac-linux/Sync - Pull now and then."
 echo
+nohup bash ./mac-linux/keep-awake.sh >/dev/null 2>&1 &   # awake only while jobs run (config/awake.env), no window
 bash ./scripts/relay.sh

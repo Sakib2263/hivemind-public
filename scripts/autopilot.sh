@@ -13,6 +13,7 @@ cd "$DIR" 2>/dev/null || { echo "Folder not found: $DIR"; exit 1; }
 [ -f TASKS.md ] || { echo "No TASKS.md in $DIR: nothing to continue."; exit 1; }
 STOP="$KIT/relay/AUTOPILOT.stop"; rm -f "$STOP" "$DIR/AUTOPILOT.stop"
 LOGD="$KIT/logs/autopilot"; mkdir -p "$LOGD"
+( while kill -0 $$ 2>/dev/null; do date +%s > "$KIT/relay/activity"; sleep 60; done ) &   # keeps the computer awake while autopilot runs
 LOG="$LOGD/$(basename "$DIR" | tr ' ' '_')-$(date +%Y%m%d-%H%M).log"
 END=$(( $(date +%s) + HOURS * 3600 )); STEP_MAX="${AUTOPILOT_STEP_SECONDS:-3600}"
 LIMIT='rate.?limit|429|quota|usage limit|limit reached|too many requests|overloaded|503|not logged in'

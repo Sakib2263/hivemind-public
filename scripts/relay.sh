@@ -6,7 +6,7 @@
 # Job file: relay/inbox/<id>.job
 #   worker: opencode | agy | review | gate | graph | git-commit | android | files | upload | install | comfy | video | assets   (codex, codex-review, deepseek: when those plans/keys exist)
 #   dir:    <project folder in WSL form>   (must be inside the work folder that holds this kit)
-#   model:  opencode: free | free2 | nv | nv2 | <model id>.  agy: hard.  gate/review: engine list, e.g. "agy opencode:free"
+#   model:  opencode: free | free2 | nv | nv2 | nvglm | nvds | nvcode | nvbig | nvlong | nvmistral | <model id>.  agy: hard.  gate/review: engine list, e.g. "agy opencode:free"
 #   gate:   build | security | release     (gate only, see gates/)
 #   base:   main  / commit: <sha>          (review only; default = uncommitted changes)
 #   effort: medium                         (codex only)
@@ -88,6 +88,12 @@ oc_model() {  # opencode model shortcut -> model id
     free2) echo "$OPENCODE_FREE2_MODEL" ;;
     nv) echo "$NVIDIA_MODEL" ;;
     nv2) echo "$NVIDIA_MODEL2" ;;
+    nvglm) echo "$NVIDIA_GLM" ;;
+    nvds) echo "$NVIDIA_DEEPSEEK" ;;
+    nvcode) echo "$NVIDIA_CODE" ;;
+    nvbig) echo "$NVIDIA_BIG" ;;
+    nvlong) echo "$NVIDIA_LONG" ;;
+    nvmistral) echo "$NVIDIA_MISTRAL" ;;
     copilot) echo "$OPENCODE_COPILOT_MODEL" ;;
     gemini) echo "$OPENCODE_GEMINI_MODEL" ;;
     *) echo "$1" ;;
@@ -155,12 +161,10 @@ attempt() {  # one try: $1 worker  $2 model (for gate/review: engine[:model])  -
       if [ -n "$am" ]; then timeout "$MAX_SECONDS" agy -p "$prompt" --model "$am" < /dev/null 2>&1
       else timeout "$MAX_SECONDS" agy -p "$prompt" < /dev/null 2>&1; fi ;;
     graph)
-      # "update" (or empty) = build or refresh graphify-out/; anything else = a question to the graph
-      local q; q="$(printf '%s' "$prompt" | head -1 | tr -d '[:space:]')"
-      if [ -z "$q" ] || [ "$q" = "update" ] || [ "$q" = "build" ]; then
-        if [ -d graphify-out ]; then timeout "$MAX_SECONDS" graphify . --update < /dev/null 2>&1
-        else timeout "$MAX_SECONDS" graphify . < /dev/null 2>&1; fi
-      else timeout "$MAX_SECONDS" graphify query "$prompt" < /dev/null 2>&1; fi ;;
+      # "update" (or empty) = build or refresh graphify-out/; "explain X", "path A B", "affected X", "hubs";
+      # anything else = a question to the graph. Code only, no model, no tokens (scripts/graph.sh)
+      local q; q="$(printf '%s' "$prompt" | head -1 | tr -d '\r')"
+      timeout 900 bash "$ROOT/scripts/graph.sh" "$real" "${q:-update}" < /dev/null 2>&1 ;;
     android)
       # body: "debug" (test APK) or "release" (signed AAB + APK). Never asks: missing facts come back as MISSING (exit 3)
       local mode; mode="$(printf '%s' "$prompt" | head -1 | tr -d '[:space:]')"
@@ -253,7 +257,8 @@ run_job() {  # runs in the background, one per job
   local before; before="$(git rev-parse --short HEAD 2>/dev/null)"
 
   # the chain of tries: the job's own worker first, then fallbacks (job header "fallback:" or config/models.env)
-  local chain fbvar="FALLBACK_${worker//-/_}"
+  local chain fbvar="FALLBACK_${worker//-/_}" fbm="FALLBACK_${worker//-/_}_${model//[^A-Za-z0-9]/_}"
+  [ -n "$model" ] && [ -n "${!fbm}" ] && fbvar="$fbm"   # a chain for this model (config/models.env) wins
   case "$worker" in
     gate)   chain="${model:-$GATE_ENGINES}" ;;
     review) chain="${model:-$REVIEW_ENGINES}" ;;
@@ -276,7 +281,10 @@ run_job() {  # runs in the background, one per job
     else w="${spec%%:*}"; m=""; [[ "$spec" == *:* ]] && m="${spec#*:}"; fi
     rm -f "$res.last"; echo "=== try: $spec" >> "$res.out"
     local t0; t0="$(date +%s)"
+    local st0; st0="$({ git diff; git status --porcelain; } 2>/dev/null | md5sum)"
     attempt "$w" "$m" > "$res.try"; code=$?
+    # a build worker that exits 0 but changed nothing and reported no "Done" only read files: treat as unavailable, try the next model
+    if [ "$code" -eq 0 ] && [ "$w" = opencode ] && [ "$st0" = "$({ git diff; git status --porcelain; } 2>/dev/null | md5sum)" ] && ! grep -qiE '^[^a-z]*done' "$res.try"; then echo "=== $spec made no changes and gave no result" >> "$res.out"; code=75; fi
     # a worker that stopped on a provider limit says so (rules/AGENTS-floor.md, "Limits"): treat it as a limit
     [ "$code" -eq 0 ] && tail -n 40 "$res.try" | grep -qiE '^[^a-z]*blockers?[^:]*:[[:space:]]*(rate limit|quota)' && code=75
     cat "$res.try" >> "$res.out"; used="$spec"
@@ -288,6 +296,8 @@ run_job() {  # runs in the background, one per job
   [ -s "$res.last" ] || tail -n 60 "$res.try" > "$res.last" 2>/dev/null
   rm -f "$res.try"; echo "worker used: $used" >> "$res.last"
 
+  # project memory: keep graphify-out/GRAPH_REPORT.md current so the next chat reads the map, not the code
+  [ "$worker" != graph ] && timeout 600 bash "$ROOT/scripts/graph.sh" "$real" ensure > "$res.graph" 2>&1 < /dev/null
   if git rev-parse --git-dir >/dev/null 2>&1; then
     { echo "HEAD before: $before  after: $(git rev-parse --short HEAD)"; git status --short; echo; git diff --stat; } > "$res.git"
     git diff > "$res.diff"
@@ -297,10 +307,13 @@ run_job() {  # runs in the background, one per job
   echo "[$(date +%H:%M:%S)] job $id finished (exit $code)"
 }
 
+python3 "$ROOT/scripts/providers.py" opencode-tmp 2>/dev/null   # headless workers may use /tmp (scratch installs, test runs)
 echo "Relay running. Watching $IN (up to $MAX_JOBS jobs at once, one per project folder)"
 echo "Leave this window open. Ctrl+C to stop."
 while true; do
   date +%s > "$R/heartbeat"   # Claude checks this: older than a minute = relay not running
+  # keep-awake (windows/keep-awake.ps1, mac-linux/keep-awake.sh) reads this: work queued or running = now
+  { [ "$(jobs -rp | wc -l)" -gt 0 ] || compgen -G "$IN/*.job" >/dev/null; } && date +%s > "$R/activity"
   for job in "$IN"/*.job; do
     [ -e "$job" ] || continue
     [ "$(jobs -rp | wc -l)" -ge "$MAX_JOBS" ] && break

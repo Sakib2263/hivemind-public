@@ -1,7 +1,7 @@
 # Android builds (read only for APK / release work)
 
 1. Read the project's `android.env` (template: `templates/android.env`). Unity project? Stop: Unity builds
-   follow `plans/UNITY-PLAN.md`.
+   follow `stacks/unity.md`.
 2. Test APK (`debug`): ask nothing. An undecided name or bundle id gets a stand-in that is not saved.
    Release: missing or unconfirmed APP_NAME, APP_ID (bundle id) or ICON (1024x1024 PNG): ask the owner in one short
    message, with a suggestion (BUNDLE_PREFIX from `secrets/android/signing.env` + the game name). The bundle id can never change after the first Play

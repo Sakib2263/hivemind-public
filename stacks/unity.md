@@ -2,7 +2,7 @@
 
 Skills: game-studio-lead (router), game-developer (shipping rules), the Unity plugin skills (unity-cli,
 new-unity-project, levelplay-unity-integration, implement-in-app-purchases, optimize-web, ui, physics-3d-collision),
-google-play-release. Full Unity plan and status: `plans/UNITY-PLAN.md`.
+google-play-release.
 
 ## Rules for agents in Unity projects
 - Never hand-edit `.unity`, `.prefab` or `.asset` YAML. Change scenes and settings through the editor
@@ -45,6 +45,6 @@ Until the relay `unity` worker exists: the owner presses Play / Build in the edi
 
 ## Build and release
 - Android: Unity build (APK for tests, AAB for Play), signed with the kit's `secrets/android/signing.env`
-  keystore (UNITY-PLAN U6), then the google-play-release skill.
+  keystore, then the google-play-release skill.
 - WebGL: Brotli or Gzip, under the portal's size limit, browser smoke test.
 - iOS (later): Xcode export, needs a Mac or a cloud Mac.

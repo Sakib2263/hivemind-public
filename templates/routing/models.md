@@ -7,8 +7,13 @@ Model ids: `config/models.env`. Usage left: `USAGE.md` "At a glance". This file 
 |---|---|---|---|
 | `opencode:free` | GLM-5.3-Flash (OpenCode Zen) | free, shared rate limit, zero retention | main builder: features, core drafts |
 | `opencode:free2` | DeepSeek V4.1 Flash (OpenCode Zen) | free, shared rate limit, zero retention | mechanical work, bulk edits, second builder |
-| `opencode:nv` | MiniMax M3.1 Flash (NVIDIA build, optional) | free key, per-minute limit | builder when Zen is busy; cross-vendor reviewer and gate |
-| `opencode:nv2` | Nemotron 3.5 Super (NVIDIA build, optional) | free key, per-minute limit | reasoning, reading, second opinion, reviewer |
+| `opencode:nvglm` / `nvds` | GLM-5.3-Flash / DeepSeek V4.1 Flash on NVIDIA | NVIDIA bucket (below) | same model as free / free2 when Zen is busy |
+| `opencode:nv` | MiniMax M3.1 Flash (NVIDIA) | NVIDIA bucket | builder; cross-vendor reviewer and gate |
+| `opencode:nv2` | Nemotron 3.5 Super (NVIDIA) | NVIDIA bucket | reasoning, reviews |
+| `opencode:nvmistral` | Mistral Large 4 (NVIDIA) | NVIDIA bucket | another vendor for reviews |
+| `opencode:nvcode` | Poolside Laguna XS 2.1 (NVIDIA) | NVIDIA bucket | small coding agent: mechanical rows |
+| `opencode:nvbig` | Nemotron 3 Ultra 550B (NVIDIA) | NVIDIA bucket, slow | hard reasoning, second opinions |
+| `opencode:nvlong` | Step 5 preview, 1M context (NVIDIA) | NVIDIA bucket | reading big folders and logs |
 | `agy` / `agy:hard` | Gemini Flash / Gemini 3.1 Pro (Antigravity) | free tier, weekly quota | reviews (first choice), big reading, hard second opinions |
 | `codex` | Codex (any ChatGPT login) | plan quota, small on free | reviews and builds when logged in |
 | `deepseek` | DeepSeek API | pay per use, needs key | last resort |
@@ -16,15 +21,22 @@ Model ids: `config/models.env`. Usage left: `USAGE.md` "At a glance". This file 
 Weekly quotas (Antigravity, Codex) are the scarce ones after Claude: spend them on reviews and hard questions,
 not on builds a free model can do. Per-minute limits (NVIDIA) recover in minutes: use them for volume.
 
+**The NVIDIA bucket.** NVIDIA publishes no number for its free endpoints; users report about 40 requests a minute per
+account, shared by all models, and no daily cap. So more NVIDIA models add choice, not capacity: one agentic job
+uses most of it. Run at most one NVIDIA job at a time next to a Zen job. A 429 benches that model for 5 minutes and
+the chain moves on; the other nv models usually answer with 429 too and are passed in seconds.
+
 ## Who gets the job (first choice > automatic fallback)
 | Job | First | Fallback chain (relay does it) |
 |---|---|---|
-| feature, core draft | `opencode` (GLM) | DeepSeek > MiniMax > Nemotron > Antigravity > Codex > DeepSeek API |
-| mechanical | `opencode` `model: free2` (DeepSeek) | GLM > MiniMax > Nemotron > ... |
-| review | `review` (REVIEW_ENGINES) | Antigravity > MiniMax > Codex > Nemotron > DeepSeek > GLM |
-| gate | `gate` (GATE_ENGINES) | GLM > DeepSeek > MiniMax > Antigravity > Codex |
-| read, "how does X work" | `graph` question, then `agy` | Gemini Pro > Nemotron > GLM |
-| second opinion | `agy` `model: hard` | Nemotron > GLM > Codex |
+| feature, core draft | `opencode` (GLM) | GLM on NVIDIA > DeepSeek > DeepSeek on NVIDIA > MiniMax > Nemotron > Antigravity > Codex > DeepSeek API |
+| mechanical | `opencode` `model: free2` (DeepSeek) | DeepSeek on NVIDIA > Laguna > GLM > GLM on NVIDIA > MiniMax > ... |
+| review | `review` (REVIEW_ENGINES) | Antigravity > MiniMax > Mistral > Codex > Nemotron > DeepSeek > GLM |
+| gate | `gate` (GATE_ENGINES) | GLM > GLM on NVIDIA > DeepSeek > MiniMax > Antigravity > Codex |
+| read, "how does X work" | `graph` question (free, seconds), then `agy` | Gemini Pro > Step 5 (1M context) > Nemotron Ultra > Nemotron > GLM |
+| second opinion | `agy` `model: hard` | Step 5 > Nemotron Ultra > Nemotron > GLM > Codex |
+
+Chains per model live in `config/models.env` (`FALLBACK_opencode_free2` and so on) and win over the worker's chain.
 
 ## Max efficiency
 - **Spread parallel jobs across providers.** Two jobs at once: give them different first models (for example

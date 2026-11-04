@@ -1,4 +1,4 @@
-/* More games + exit prompt for Your Studio web games (browser, Playgama, Android/Capacitor).
+/* More games + exit prompt for your web games (browser, Playgama, Android/Capacitor).
    Drop-in: <script src="more-games.js"></script>, then MoreGames.init({...}) once the page is ready.
    Generated from hivemind/templates/more-games/ (games.json + more-games.src.js). Edit the source, not the copy. */
 (function () {

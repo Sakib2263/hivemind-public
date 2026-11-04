@@ -6,7 +6,7 @@
 # listed as "MISSING:" (exit 3) when run by the relay, so Claude can ask the owner.
 # Signing: one keystore for all apps, set once per PC in the kit's secrets/android/signing.env (never committed).
 # New users are asked for it (studio, bundle start, keystore, alias, password) before the bundle id.
-# Unity projects are built through Unity (plans/UNITY-PLAN.md), not here.
+# Unity projects are built through Unity (stacks/unity.md), not here.
 KIT="$(cd "$(dirname "$0")/.." && pwd)"
 export ANDROID_HOME="$HOME/android-sdk"
 export PATH="$HOME/.local/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
@@ -18,7 +18,7 @@ TTY=0; [ -t 0 ] && TTY=1
 
 case "$MODE" in debug|release) ;; *) die "build type must be debug or release" ;; esac
 [ -d "$P" ] || die "project folder not found: $P"
-[ -f "$P/ProjectSettings/ProjectVersion.txt" ] && die "this is a Unity project: build it from Unity (see plans/UNITY-PLAN.md)"
+[ -f "$P/ProjectSettings/ProjectVersion.txt" ] && die "this is a Unity project: build it from Unity (see stacks/unity.md)"
 command -v javac >/dev/null && [ -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ] \
   || die "Android build tools are not installed: run '6 Optional - Android Build Tools.bat' first"
 command -v npx >/dev/null || die "Node is missing: run '2 Install AI Tools.bat'"

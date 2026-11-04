@@ -6,6 +6,8 @@ pushd "%~dp0.."
 echo Starting Hivemind: checking the relay...
 wsl.exe -- bash -c "h=$(cat relay/heartbeat 2>/dev/null); [ -n \"$h\" ] && [ $(( $(date +%%s) - h )) -lt 60 ]" && (echo The relay is already running.) || (start "Relay (leave open)" "%~dp0shortcuts\1 Start Relay.bat" & echo Relay started in its own window: leave it open, minimised.)
 call "%~dp0shortcuts\20 Usage Overlay.bat"
+rem keep-awake: hidden, only one copy runs, holds the PC awake only while jobs run (config\awake.env)
+start "" conhost.exe powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%~dp0keep-awake.ps1"
 echo.
 rem which workers are connected; a missing one is listed with how to add it
 echo Checking which workers are connected...
